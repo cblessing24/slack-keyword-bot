@@ -23,6 +23,8 @@ start = "flask run --port 80 --host 0.0.0.0"
 dev = [
     "pytest>=7.1.2",
     "mypy>=0.950",
+    "black>=22.3.0",
+    "isort>=5.10.1",
 ]
 [build-system]
 requires = ["pdm-pep517>=0.12.0"]
