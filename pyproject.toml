@@ -1,0 +1,43 @@
+[project]
+name = "slack-app"
+version = "0.1.0"
+description = "Slack App"
+authors = [
+    {name = "Christoph Blessing", email = "33834216+cblessing24@users.noreply.github.com"},
+]
+dependencies = [
+    "flask>=2.1.2",
+    "slack-bolt>=1.13.1",
+    "python-dotenv>=0.20.0",
+]
+requires-python = ">=3.8"
+license = {text = "GPL-3.0-or-later"}
+[project.optional-dependencies]
+
+[tool]
+[tool.pdm]
+[tool.pdm.scripts]
+start = "flask run --port 80 --host 0.0.0.0"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.1.2",
+    "mypy>=0.950",
+]
+[build-system]
+requires = ["pdm-pep517>=0.12.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 120
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.8"
+files = "src/**/*.py"
+strict = true
