@@ -41,5 +41,8 @@ skip_gitignore = true
 
 [tool.mypy]
 python_version = "3.8"
-files = "src/**/*.py"
+files = [
+    "src/**/*.py",
+    "tests/**/*.py"
+]
 strict = true
