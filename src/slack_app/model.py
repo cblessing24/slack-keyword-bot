@@ -1,19 +1,25 @@
 import re
 from dataclasses import dataclass
+from typing import NewType
+
+Channel = NewType("Channel", str)
+User = NewType("User", str)
+Word = NewType("Word", str)
+Text = NewType("Text", str)
 
 
 @dataclass(frozen=True)
 class Keyword:
-    channel: str
-    user: str
-    word: str
+    channel: Channel
+    user: User
+    word: Word
 
 
 @dataclass(frozen=True)
 class Message:
-    channel: str
-    user: str
-    text: str
+    channel: Channel
+    user: User
+    text: Text
 
     def __contains__(self, word: Keyword) -> bool:
         pattern = re.compile(r"\b" + word.word + r"\b")
