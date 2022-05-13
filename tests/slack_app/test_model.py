@@ -2,29 +2,29 @@ from typing import Callable
 
 import pytest
 
-from slack_app.model import Keyword, Message
+from slack_app.model import Channel, Keyword, Message, Text, User, Word
 
 
 def test_keyword_can_be_created() -> None:
-    Keyword(channel="mychannel", user="bob", word="something")
+    Keyword(channel=Channel("mychannel"), user=User("bob"), word=Word("something"))
 
 
 def test_message_can_be_created() -> None:
-    Message(channel="mychannel", user="bob", text="hello world")
+    Message(channel=Channel("mychannel"), user=User("bob"), text=Text("hello world"))
 
 
-@pytest.fixture
-def keyword() -> Callable[[str], Keyword]:
-    def _keyword(word: str) -> Keyword:
-        return Keyword(channel="mychannel", user="bob", word=word)
+@pytest.fixture  # type: ignore[misc]
+def keyword() -> Callable[[Word], Keyword]:
+    def _keyword(word: Word) -> Keyword:
+        return Keyword(channel=Channel("mychannel"), user=User("bob"), word=word)
 
     return _keyword
 
 
-@pytest.fixture
-def msg() -> Callable[[str], Message]:
-    def _msg(text: str) -> Message:
-        return Message(channel="mychannel", user="bob", text=text)
+@pytest.fixture  # type: ignore[misc]
+def msg() -> Callable[[Text], Message]:
+    def _msg(text: Text) -> Message:
+        return Message(channel=Channel("mychannel"), user=User("bob"), text=text)
 
     return _msg
 
