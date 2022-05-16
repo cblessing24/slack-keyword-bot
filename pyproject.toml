@@ -9,6 +9,7 @@ dependencies = [
     "flask>=2.1.2",
     "slack-bolt>=1.13.1",
     "python-dotenv>=0.20.0",
+    "sqlalchemy>=1.4.36",
 ]
 requires-python = ">=3.8"
 license = {text = "GPL-3.0-or-later"}
@@ -25,6 +26,7 @@ dev = [
     "mypy>=0.950",
     "black>=22.3.0",
     "isort>=5.10.1",
+    "pynvim>=0.4.3",
 ]
 [build-system]
 requires = ["pdm-pep517>=0.12.0"]
