@@ -8,7 +8,7 @@ Word = NewType("Word", str)
 Text = NewType("Text", str)
 
 
-@dataclass(frozen=True)
+@dataclass
 class Keyword:
     channel: Channel
     user: User
