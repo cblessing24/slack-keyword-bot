@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import clear_mappers, sessionmaker
 
-from slack_app.orm import metadata, start_mappers
+from slack_app.adapters.orm import metadata, start_mappers
 
 
 @pytest.fixture

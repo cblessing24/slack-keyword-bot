@@ -1,8 +1,8 @@
 from typing import List, Set
 
-from slack_app.model import Channel, Keyword, User, Word
-from slack_app.repository import AbstractRepository
-from slack_app.services import add_keyword
+from slack_app.adapters.repository import AbstractRepository
+from slack_app.domain.model import Channel, Keyword, User, Word
+from slack_app.service_layer.services import add_keyword
 
 
 class FakeRepository(AbstractRepository):

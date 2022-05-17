@@ -1,7 +1,7 @@
 from sqlalchemy.orm.session import Session
 
-from .model import Keyword
-from .repository import AbstractRepository
+from ..adapters.repository import AbstractRepository
+from ..domain.model import Keyword
 
 
 def add_keyword(repo: AbstractRepository, session: Session, keyword: Keyword) -> None:

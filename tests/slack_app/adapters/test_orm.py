@@ -1,6 +1,6 @@
 from typing import Any
 
-from slack_app.model import Channel, Keyword, User, Word
+from slack_app.domain.model import Channel, Keyword, User, Word
 
 
 def test_keyword_mapper_can_load_keywords(session: Any) -> None:

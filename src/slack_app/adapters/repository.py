@@ -3,7 +3,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from slack_app.model import Channel, Keyword, User
+from slack_app.domain.model import Channel, Keyword, User
 
 
 class AbstractRepository(ABC):

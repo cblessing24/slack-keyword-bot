@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, MetaData, String, Table
+from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.orm import registry
 
-from .model import Keyword
+from ..domain.model import Keyword
 
 mapper_registry = registry()
 metadata = mapper_registry.metadata

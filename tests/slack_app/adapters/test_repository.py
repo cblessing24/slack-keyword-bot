@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from slack_app.model import Channel, Keyword, User, Word
-from slack_app.repository import SQLAlchemyRepository
+from slack_app.adapters.repository import SQLAlchemyRepository
+from slack_app.domain.model import Channel, Keyword, User, Word
 
 
 def test_can_add_keyword(session: Session) -> None:

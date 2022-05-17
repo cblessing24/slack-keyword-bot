@@ -2,7 +2,7 @@ from typing import Callable
 
 import pytest
 
-from slack_app.model import Channel, Keyword, Message, Text, User, Word
+from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word
 
 
 def test_keyword_can_be_created() -> None:
