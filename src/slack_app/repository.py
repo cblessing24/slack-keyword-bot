@@ -24,4 +24,4 @@ class SQLAlchemyRepository(AbstractRepository):
         self.session.add(keyword)
 
     def get(self, channel: Channel, user: User) -> List[Keyword]:
-        return self.session.query(Keyword).filter_by(channel=channel, user=user).all()
+        return self.session.query(Keyword).filter_by(channel=channel, user=user).all()  # type: ignore[no-any-return]

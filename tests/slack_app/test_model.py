@@ -13,7 +13,7 @@ def test_message_can_be_created() -> None:
     Message(channel=Channel("mychannel"), user=User("bob"), text=Text("hello world"))
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def keyword() -> Callable[[Word], Keyword]:
     def _keyword(word: Word) -> Keyword:
         return Keyword(channel=Channel("mychannel"), user=User("bob"), word=word)
@@ -21,7 +21,7 @@ def keyword() -> Callable[[Word], Keyword]:
     return _keyword
 
 
-@pytest.fixture  # type: ignore[misc]
+@pytest.fixture
 def msg() -> Callable[[Text], Message]:
     def _msg(text: Text) -> Message:
         return Message(channel=Channel("mychannel"), user=User("bob"), text=text)
