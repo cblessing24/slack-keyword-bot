@@ -48,12 +48,8 @@ files = [
     "tests/**/*.py"
 ]
 strict = true
+mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = [
-    "pytest.*",
-    "dotenv.*",
-    "slack_bolt.*",
-    "flask.*",
-]
+module = ["sqlalchemy.*"]
 ignore_missing_imports = true
