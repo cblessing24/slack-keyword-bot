@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import Iterable, List, Optional
 
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, Keyword, User, Word
@@ -6,8 +6,8 @@ from slack_app.service_layer.services import add_keyword
 
 
 class FakeRepository(AbstractRepository):
-    def __init__(self) -> None:
-        self.keywords: Set[Keyword] = set()
+    def __init__(self, keywords: Optional[Iterable[Keyword]] = None) -> None:
+        self.keywords = set(keywords) if keywords else set()
 
     def add(self, keyword: Keyword) -> None:
         self.keywords.add(keyword)
