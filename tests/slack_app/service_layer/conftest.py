@@ -13,8 +13,8 @@ class FakeRepository(AbstractRepository):
     def add(self, keyword: Keyword) -> None:
         self.keywords.add(keyword)
 
-    def get(self, channel: Channel, user: User) -> List[Keyword]:
-        return [k for k in self.keywords if k.channel == channel and k.user == user]
+    def get(self, channel: Channel) -> List[Keyword]:
+        return [k for k in self.keywords if k.channel == channel]
 
 
 class RepositoryCreator(Protocol):

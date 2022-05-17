@@ -16,7 +16,7 @@ def test_keyword_gets_added_to_repository(create_repo: RepositoryCreator) -> Non
     session = FakeSession()
     keyword = Keyword(channel=Channel("general"), user=User("bob"), word=Word("hello"))
     add_keyword(repo, session, keyword)
-    assert repo.get(keyword.channel, keyword.user) == [keyword]
+    assert repo.get(keyword.channel) == [keyword]
 
 
 def test_added_keyword_gets_committed(create_repo: RepositoryCreator) -> None:

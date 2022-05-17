@@ -12,7 +12,7 @@ class AbstractRepository(ABC):
         pass
 
     @abstractmethod
-    def get(self, channel: Channel, user: User) -> List[Keyword]:
+    def get(self, channel: Channel) -> List[Keyword]:
         pass
 
 
@@ -23,5 +23,5 @@ class SQLAlchemyRepository(AbstractRepository):
     def add(self, keyword: Keyword) -> None:
         self.session.add(keyword)
 
-    def get(self, channel: Channel, user: User) -> List[Keyword]:
-        return self.session.query(Keyword).filter_by(channel=channel, user=user).all()  # type: ignore[no-any-return]
+    def get(self, channel: Channel) -> List[Keyword]:
+        return self.session.query(Keyword).filter_by(channel=channel).all()  # type: ignore[no-any-return]
