@@ -8,7 +8,7 @@ Word = NewType("Word", str)
 Text = NewType("Text", str)
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class Keyword:
     channel: Channel
     user: User
