@@ -15,3 +15,8 @@ def get_subscribers(repo: AbstractRepository, channel: str, user: str, text: str
     keywords = repo.get(Channel(channel))
     message = Message(Channel(channel), User(user), Text(text))
     return {k.user for k in keywords if k in message}
+
+
+def list_keywords(repo: AbstractRepository, channel: str, user: str) -> Set[str]:
+    keywords = repo.get(Channel(channel))
+    return {k.word for k in keywords if k.user == User(user)}
