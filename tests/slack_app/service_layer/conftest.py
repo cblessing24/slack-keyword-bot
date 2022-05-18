@@ -43,3 +43,15 @@ class FakeRepositoryCreator:
 @pytest.fixture
 def create_repo() -> FakeRepositoryCreator:
     return FakeRepositoryCreator()
+
+
+class FakeSession:
+    committed = False
+
+    def commit(self) -> None:
+        self.committed = True
+
+
+@pytest.fixture
+def session() -> FakeSession:
+    return FakeSession()
