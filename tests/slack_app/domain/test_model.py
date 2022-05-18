@@ -10,7 +10,7 @@ def test_keyword_can_be_created() -> None:
 
 
 def test_message_can_be_created() -> None:
-    Message(channel=Channel("mychannel"), user=User("bob"), text=Text("hello world"))
+    Message(channel=Channel("mychannel"), author=User("bob"), text=Text("hello world"))
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def create_keyword() -> Callable[[Word], Keyword]:
 @pytest.fixture
 def create_msg() -> Callable[[Text], Message]:
     def create(text: Text) -> Message:
-        return Message(channel=Channel("mychannel"), user=User("bob"), text=text)
+        return Message(channel=Channel("mychannel"), author=User("bob"), text=text)
 
     return create
 

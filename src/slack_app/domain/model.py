@@ -18,7 +18,7 @@ class Keyword:
 @dataclass(frozen=True)
 class Message:
     channel: Channel
-    user: User
+    author: User
     text: Text
 
     def __contains__(self, word: Keyword) -> bool:
