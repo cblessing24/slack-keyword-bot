@@ -1,9 +1,11 @@
-from typing import Iterable, List, Optional, Protocol, Set
+from __future__ import annotations
+
+from typing import Iterable, List, Optional, Protocol, Set, Tuple
 
 import pytest
 
 from slack_app.adapters.repository import AbstractRepository
-from slack_app.domain.model import Channel, Keyword, User
+from slack_app.domain.model import Channel, Keyword, User, Word
 
 
 class FakeRepository(AbstractRepository):
@@ -15,6 +17,19 @@ class FakeRepository(AbstractRepository):
 
     def get(self, channel: Channel) -> List[Keyword]:
         return [k for k in self.keywords if k.channel == channel]
+
+    @staticmethod
+    def for_keywords(keywords: Iterable[Tuple[str, str, str]]) -> FakeRepository:
+        return FakeRepository(
+            {
+                Keyword(
+                    channel=Channel(channel),
+                    user=User(user),
+                    word=Word(word),
+                )
+                for channel, word, user in keywords
+            }
+        )
 
 
 class RepositoryCreator(Protocol):
