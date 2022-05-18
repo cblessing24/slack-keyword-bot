@@ -3,11 +3,11 @@ from typing import Set
 from sqlalchemy.orm.session import Session
 
 from ..adapters.repository import AbstractRepository
-from ..domain.model import Keyword, Message, User
+from ..domain.model import Channel, Keyword, Message, User, Word
 
 
-def add_keyword(repo: AbstractRepository, session: Session, keyword: Keyword) -> None:
-    repo.add(keyword)
+def add_keyword(repo: AbstractRepository, session: Session, channel: str, user: str, word: str) -> None:
+    repo.add(Keyword(Channel(channel), User(user), Word(word)))
     session.commit()
 
 

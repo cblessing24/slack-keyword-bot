@@ -14,13 +14,11 @@ class FakeSession:
 def test_keyword_gets_added_to_repository(create_repo: RepositoryCreator) -> None:
     repo = create_repo()
     session = FakeSession()
-    keyword = Keyword(channel=Channel("general"), user=User("bob"), word=Word("hello"))
-    add_keyword(repo, session, keyword)
-    assert repo.get(keyword.channel) == [keyword]
+    add_keyword(repo, session, channel="general", user="bob", word="hello")
+    assert repo.get(Channel("general")) == [Keyword(channel=Channel("general"), user=User("bob"), word=Word("hello"))]
 
 
 def test_added_keyword_gets_committed(create_repo: RepositoryCreator) -> None:
     session = FakeSession()
-    keyword = Keyword(channel=Channel("general"), user=User("bob"), word=Word("hello"))
-    add_keyword(create_repo(), session, keyword)
+    add_keyword(create_repo(), session, channel="general", user="bob", word="hello")
     assert session.committed
