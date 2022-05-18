@@ -14,30 +14,34 @@ def test_message_can_be_created() -> None:
 
 
 @pytest.fixture
-def keyword() -> Callable[[Word], Keyword]:
-    def _keyword(word: Word) -> Keyword:
+def create_keyword() -> Callable[[Word], Keyword]:
+    def create(word: Word) -> Keyword:
         return Keyword(channel=Channel("mychannel"), user=User("bob"), word=word)
 
-    return _keyword
+    return create
 
 
 @pytest.fixture
-def msg() -> Callable[[Text], Message]:
-    def _msg(text: Text) -> Message:
+def create_msg() -> Callable[[Text], Message]:
+    def create(text: Text) -> Message:
         return Message(channel=Channel("mychannel"), user=User("bob"), text=text)
 
-    return _msg
+    return create
 
 
-def test_message_contains_keyword(keyword: Callable[[str], Keyword], msg: Callable[[str], Message]) -> None:
-    assert keyword("World") in msg("Hello World!")
+def test_message_contains_keyword(
+    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
+) -> None:
+    assert create_keyword("World") in create_msg("Hello World!")
 
 
-def test_message_does_not_contain_keyword(keyword: Callable[[str], Keyword], msg: Callable[[str], Message]) -> None:
-    assert keyword("Goodbye") not in msg("Hello World!")
+def test_message_does_not_contain_keyword(
+    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
+) -> None:
+    assert create_keyword("Goodbye") not in create_msg("Hello World!")
 
 
 def test_message_does_not_contain_partial_keyword(
-    keyword: Callable[[str], Keyword], msg: Callable[[str], Message]
+    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
 ) -> None:
-    assert keyword("Good") not in msg("Goodbye World!")
+    assert create_keyword("Good") not in create_msg("Goodbye World!")
