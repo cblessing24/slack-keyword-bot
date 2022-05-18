@@ -3,7 +3,7 @@ from typing import Set
 from sqlalchemy.orm.session import Session
 
 from ..adapters.repository import AbstractRepository
-from ..domain.model import Channel, Keyword, Message, User, Word
+from ..domain.model import Channel, Keyword, Message, Text, User, Word
 
 
 def add_keyword(repo: AbstractRepository, session: Session, channel: str, user: str, word: str) -> None:
@@ -11,6 +11,7 @@ def add_keyword(repo: AbstractRepository, session: Session, channel: str, user: 
     session.commit()
 
 
-def get_subscribers(repo: AbstractRepository, message: Message) -> Set[User]:
-    keywords = repo.get(message.channel)
+def get_subscribers(repo: AbstractRepository, channel: str, user: str, text: str) -> Set[str]:
+    keywords = repo.get(Channel(channel))
+    message = Message(Channel(channel), User(user), Text(text))
     return {k.user for k in keywords if k in message}
