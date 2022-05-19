@@ -29,7 +29,12 @@ def in_memory_db() -> Any:
 
 
 @pytest.fixture
-def session(in_memory_db: Any) -> Any:
+def session_factory(in_memory_db: Any) -> Any:
     start_mappers()
-    yield sessionmaker(bind=in_memory_db)()
+    yield sessionmaker(bind=in_memory_db)
     clear_mappers()
+
+
+@pytest.fixture
+def session(session_factory: Any) -> Any:
+    return session_factory()
