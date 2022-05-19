@@ -17,13 +17,11 @@ def test_added_keyword_gets_committed(create_repo: FakeRepositoryCreator, sessio
 
 def test_subscribers_are_returned(create_repo: FakeRepositoryCreator, session: FakeSession) -> None:
     repo = create_repo()
-    keywords = [
-        ("general", "bob", "Hello"),
-        ("general", "bob", "World"),
-        ("general", "alice", "World"),
-        ("random", "alice", "World"),
-    ]
+    in_keyword = ("general", "bob", "World")
+    out_keyword = ("general", "alice", "World")
+    author_keyword = ("general", "john", "Goodbye")
+    keywords = [in_keyword, out_keyword, author_keyword]
     for keyword in keywords:
         add_keyword(repo, session, *keyword)
-    subscribers = get_subscribers(repo, channel="general", author="john", text="Goddbye World")
+    subscribers = get_subscribers(repo, channel="general", author="john", text="Goodbye World")
     assert subscribers == {"bob", "alice"}
