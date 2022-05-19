@@ -1,6 +1,7 @@
 from slack_app.domain.model import User, get_subscribers
 
-from ..conftest import KeywordCreator, MessageCreator
+from ..conftest import KeywordCreator
+from .conftest import MessageCreator
 
 
 def test_message_contains_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:

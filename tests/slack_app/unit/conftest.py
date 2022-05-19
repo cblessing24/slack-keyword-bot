@@ -1,11 +1,24 @@
 from __future__ import annotations
 
-from typing import Iterable, List, Optional, Set, Tuple
+from typing import Iterable, List, Optional, Protocol, Set, Tuple
 
 import pytest
 
 from slack_app.adapters.repository import AbstractRepository
-from slack_app.domain.model import Channel, Keyword, User, Word
+from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word
+
+
+class MessageCreator(Protocol):
+    def __call__(self, channel: str = ..., author: str = ..., text: str = ...) -> Message:
+        ...
+
+
+@pytest.fixture
+def create_msg() -> MessageCreator:
+    def create(channel: str = "mychannel", author: str = "bob", text: str = "Hello World") -> Message:
+        return Message(channel=Channel(channel), author=User(author), text=Text(text))
+
+    return create
 
 
 class FakeRepository(AbstractRepository):
