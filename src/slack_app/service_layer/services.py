@@ -11,9 +11,9 @@ def add_keyword(repo: AbstractRepository, session: Session, channel: str, user: 
     session.commit()
 
 
-def get_subscribers(repo: AbstractRepository, channel: str, user: str, text: str) -> Set[str]:
+def get_subscribers(repo: AbstractRepository, channel: str, author: str, text: str) -> Set[str]:
     keywords = repo.get(Channel(channel))
-    message = Message(Channel(channel), User(user), Text(text))
+    message = Message(Channel(channel), User(author), Text(text))
     return {k.user for k in keywords if k in message}
 
 

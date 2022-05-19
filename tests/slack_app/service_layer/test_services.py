@@ -25,5 +25,5 @@ def test_subscribers_are_returned(create_repo: FakeRepositoryCreator, session: F
     ]
     for keyword in keywords:
         add_keyword(repo, session, *keyword)
-    subscribers = get_subscribers(repo, channel="general", user="john", text="Goddbye World")
+    subscribers = get_subscribers(repo, channel="general", author="john", text="Goddbye World")
     assert subscribers == {"bob", "alice"}
