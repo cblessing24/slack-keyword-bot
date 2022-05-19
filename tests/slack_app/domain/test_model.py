@@ -1,55 +1,51 @@
-from typing import Callable
+from typing import Protocol
 
 import pytest
 
 from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word, get_subscribers
 
 
-def test_keyword_can_be_created() -> None:
-    Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("something"))
-
-
-def test_message_can_be_created() -> None:
-    Message(channel=Channel("mychannel"), author=User("bob"), text=Text("hello world"))
+class KeywordCreator(Protocol):
+    def __call__(self, channel: str = ..., subscriber: str = ..., word: str = ...) -> Keyword:
+        ...
 
 
 @pytest.fixture
-def create_keyword() -> Callable[[Word], Keyword]:
-    def create(word: Word) -> Keyword:
-        return Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=word)
+def create_keyword() -> KeywordCreator:
+    def create(channel: str = "mychannel", subscriber: str = "bob", word: str = "hello") -> Keyword:
+        return Keyword(channel=Channel(channel), subscriber=User(subscriber), word=Word(word))
 
     return create
 
 
+class MessageCreator(Protocol):
+    def __call__(self, channel: str = ..., author: str = ..., text: str = ...) -> Message:
+        ...
+
+
 @pytest.fixture
-def create_msg() -> Callable[[Text], Message]:
-    def create(text: Text) -> Message:
-        return Message(channel=Channel("mychannel"), author=User("bob"), text=text)
+def create_msg() -> MessageCreator:
+    def create(channel: str = "mychannel", author: str = "bob", text: str = "Hello World") -> Message:
+        return Message(channel=Channel(channel), author=User(author), text=Text(text))
 
     return create
 
 
-def test_message_contains_keyword(
-    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
-) -> None:
-    assert create_keyword("World") in create_msg("Hello World!")
+def test_message_contains_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
+    assert create_keyword(word="World") in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_keyword(
-    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
-) -> None:
-    assert create_keyword("Goodbye") not in create_msg("Hello World!")
+def test_message_does_not_contain_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
+    assert create_keyword(word="Goodbye") not in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_partial_keyword(
-    create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
-) -> None:
-    assert create_keyword("Good") not in create_msg("Goodbye World!")
+def test_message_does_not_contain_partial_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
+    assert create_keyword(word="Good") not in create_msg(text="Goodbye World!")
 
 
-def test_subscribers_are_returned() -> None:
-    message = Message(channel=Channel("mychannel"), author=User("john"), text=Text("hello world"))
-    in_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("hello"))
-    out_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("goodbye"))
-    author_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("john"), word=Word("hello"))
+def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
+    message = create_msg(channel="mychannel", author="john", text="hello world")
+    in_keyword = create_keyword(channel="mychannel", subscriber="bob", word="hello")
+    out_keyword = create_keyword(channel="mychannel", subscriber="bob", word="goodbye")
+    author_keyword = create_keyword(channel="mychannel", subscriber="john", word="hello")
     assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword])) == [User("bob")]
