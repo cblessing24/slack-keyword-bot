@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import NewType
+from typing import Iterable, Iterator, NewType
 
 Channel = NewType("Channel", str)
 User = NewType("User", str)
@@ -24,3 +24,11 @@ class Message:
     def __contains__(self, word: Keyword) -> bool:
         pattern = re.compile(r"\b" + word.word + r"\b")
         return pattern.search(self.text) is not None
+
+
+def get_subscribers(message: Message, keywords: Iterable[Keyword]) -> Iterator[User]:
+    for keyword in keywords:
+        if keyword.subscriber == message.author:
+            continue
+        if keyword in message:
+            yield keyword.subscriber
