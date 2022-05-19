@@ -11,7 +11,7 @@ Text = NewType("Text", str)
 @dataclass(unsafe_hash=True)
 class Keyword:
     channel: Channel
-    user: User
+    subscriber: User
     word: Word
 
 

@@ -6,7 +6,7 @@ from .conftest import FakeRepositoryCreator, FakeSession
 def test_keyword_gets_added(create_repo: FakeRepositoryCreator, session: FakeSession) -> None:
     repo = create_repo()
     add_keyword(repo, session, channel="general", user="bob", word="hello")
-    keywords = list_keywords(repo, channel="general", user="bob")
+    keywords = list_keywords(repo, channel="general", subscriber="bob")
     assert keywords == {"hello"}
 
 

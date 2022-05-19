@@ -6,7 +6,7 @@ from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word
 
 
 def test_keyword_can_be_created() -> None:
-    Keyword(channel=Channel("mychannel"), user=User("bob"), word=Word("something"))
+    Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("something"))
 
 
 def test_message_can_be_created() -> None:
@@ -16,7 +16,7 @@ def test_message_can_be_created() -> None:
 @pytest.fixture
 def create_keyword() -> Callable[[Word], Keyword]:
     def create(word: Word) -> Keyword:
-        return Keyword(channel=Channel("mychannel"), user=User("bob"), word=word)
+        return Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=word)
 
     return create
 

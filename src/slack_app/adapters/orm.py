@@ -11,7 +11,7 @@ keyword = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("channel", String(255)),
-    Column("user", String(255)),
+    Column("subscriber", String(255)),
     Column("word", String(255)),
 )
 

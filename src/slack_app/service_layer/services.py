@@ -14,9 +14,9 @@ def add_keyword(repo: AbstractRepository, session: Session, channel: str, user: 
 def get_subscribers(repo: AbstractRepository, channel: str, author: str, text: str) -> Set[str]:
     keywords = repo.get(Channel(channel))
     message = Message(Channel(channel), User(author), Text(text))
-    return {k.user for k in keywords if k in message}
+    return {k.subscriber for k in keywords if k in message}
 
 
-def list_keywords(repo: AbstractRepository, channel: str, user: str) -> Set[str]:
+def list_keywords(repo: AbstractRepository, channel: str, subscriber: str) -> Set[str]:
     keywords = repo.get(Channel(channel))
-    return {k.word for k in keywords if k.user == User(user)}
+    return {k.word for k in keywords if k.subscriber == User(subscriber)}

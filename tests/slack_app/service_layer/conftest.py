@@ -24,10 +24,10 @@ class FakeRepository(AbstractRepository):
             {
                 Keyword(
                     channel=Channel(channel),
-                    user=User(user),
+                    subscriber=User(subscriber),
                     word=Word(word),
                 )
-                for channel, user, word in keywords
+                for channel, subscriber, word in keywords
             }
         )
 
