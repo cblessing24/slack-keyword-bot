@@ -2,7 +2,7 @@ from typing import Callable
 
 import pytest
 
-from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word
+from slack_app.domain.model import Channel, Keyword, Message, Text, User, Word, get_subscribers
 
 
 def test_keyword_can_be_created() -> None:
@@ -45,3 +45,11 @@ def test_message_does_not_contain_partial_keyword(
     create_keyword: Callable[[str], Keyword], create_msg: Callable[[str], Message]
 ) -> None:
     assert create_keyword("Good") not in create_msg("Goodbye World!")
+
+
+def test_subscribers_are_returned() -> None:
+    message = Message(channel=Channel("mychannel"), author=User("john"), text=Text("hello world"))
+    in_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("hello"))
+    out_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("bob"), word=Word("goodbye"))
+    author_keyword = Keyword(channel=Channel("mychannel"), subscriber=User("john"), word=Word("hello"))
+    assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword])) == [User("bob")]
