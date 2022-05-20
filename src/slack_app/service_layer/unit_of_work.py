@@ -6,13 +6,14 @@ from typing import Any, Generic, Optional, Type, TypeVar
 
 from ..adapters.repository import AbstractRepository, SQLAlchemyRepository
 
-R = TypeVar("R", bound=AbstractRepository)
+R = TypeVar("R", bound="AbstractRepository")
+U = TypeVar("U", bound="AbstractUnitOfWork[Any]")
 
 
 class AbstractUnitOfWork(ABC, Generic[R]):
     keywords: R
 
-    def __enter__(self) -> AbstractUnitOfWork[R]:
+    def __enter__(self: U) -> U:
         return self
 
     def __exit__(
@@ -40,7 +41,7 @@ class SQLAlchemyUnitOfWork(AbstractUnitOfWork[SQLAlchemyRepository]):
             raise RuntimeError("Session is not initialized")
         return self._session
 
-    def __enter__(self) -> AbstractUnitOfWork[SQLAlchemyRepository]:
+    def __enter__(self) -> SQLAlchemyUnitOfWork:
         session = self.session_factory()
         self.keywords = SQLAlchemyRepository(session)
         self._session = session
