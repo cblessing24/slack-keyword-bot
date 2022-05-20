@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, List, Optional, Set, Tuple
+from typing import Iterable, Optional
 
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, Keyword, User, Word
@@ -9,17 +9,17 @@ from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class FakeRepository(AbstractRepository):
-    def __init__(self, keywords: Optional[Set[Keyword]] = None) -> None:
+    def __init__(self, keywords: Optional[set[Keyword]] = None) -> None:
         self.keywords = keywords if keywords is not None else set()
 
     def add(self, keyword: Keyword) -> None:
         self.keywords.add(keyword)
 
-    def get(self, channel: Channel) -> List[Keyword]:
+    def get(self, channel: Channel) -> list[Keyword]:
         return [k for k in self.keywords if k.channel == channel]
 
     @staticmethod
-    def for_keywords(keywords: Iterable[Tuple[str, str, str]]) -> FakeRepository:
+    def for_keywords(keywords: Iterable[tuple[str, str, str]]) -> FakeRepository:
         return FakeRepository(
             {
                 Keyword(
