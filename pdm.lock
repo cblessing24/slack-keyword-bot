@@ -21,7 +21,6 @@ dependencies = [
     "pathspec>=0.9.0",
     "platformdirs>=2",
     "tomli>=1.1.0; python_version < \"3.11\"",
-    "typing-extensions>=3.10.0.0; python_version < \"3.10\"",
 ]
 
 [[package]]
@@ -48,7 +47,6 @@ dependencies = [
     "Jinja2>=3.0",
     "Werkzeug>=2.0",
     "click>=8.0",
-    "importlib-metadata>=3.6.0; python_version < \"3.10\"",
     "itsdangerous>=2.0",
 ]
 
@@ -57,15 +55,6 @@ name = "greenlet"
 version = "1.1.2"
 requires_python = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 summary = "Lightweight in-process concurrent programming"
-
-[[package]]
-name = "importlib-metadata"
-version = "4.11.3"
-requires_python = ">=3.7"
-summary = "Read metadata from Python packages"
-dependencies = [
-    "zipp>=0.5",
-]
 
 [[package]]
 name = "iniconfig"
@@ -191,7 +180,7 @@ summary = "Read key-value pairs from a .env file and set them as environment var
 
 [[package]]
 name = "slack-bolt"
-version = "1.13.2"
+version = "1.14.0"
 requires_python = ">=3.6"
 summary = "The Bolt Framework for Python"
 dependencies = [
@@ -200,7 +189,7 @@ dependencies = [
 
 [[package]]
 name = "slack-sdk"
-version = "3.16.1"
+version = "3.16.2"
 requires_python = ">=3.6.0"
 summary = "The Slack API Platform SDK for Python"
 
@@ -231,15 +220,9 @@ version = "2.1.2"
 requires_python = ">=3.7"
 summary = "The comprehensive WSGI web application library."
 
-[[package]]
-name = "zipp"
-version = "3.8.0"
-requires_python = ">=3.7"
-summary = "Backport of pathlib-compatible object wrapper for zip files"
-
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:be67cdeb953645bd98173a30d9025f1e7c23a3dd132a5a967b98f1c09fe30f0c"
+content_hash = "sha256:164a07fe9edc6a60c967a7ec2990b31177af357d937a42b3531376a1808f3afd"
 
 [metadata.files]
 "atomicwrites 1.4.0" = [
@@ -343,10 +326,6 @@ content_hash = "sha256:be67cdeb953645bd98173a30d9025f1e7c23a3dd132a5a967b98f1c09
     {file = "greenlet-1.1.2-cp39-cp39-win32.whl", hash = "sha256:f70a9e237bb792c7cc7e44c531fd48f5897961701cdaa06cf22fc14965c496cf"},
     {file = "greenlet-1.1.2-cp39-cp39-win_amd64.whl", hash = "sha256:013d61294b6cd8fe3242932c1c5e36e5d1db2c8afb58606c5a67efce62c1f5fd"},
     {file = "greenlet-1.1.2.tar.gz", hash = "sha256:e30f5ea4ae2346e62cedde8794a56858a67b878dd79f7df76a0767e356b1744a"},
-]
-"importlib-metadata 4.11.3" = [
-    {file = "importlib_metadata-4.11.3-py3-none-any.whl", hash = "sha256:1208431ca90a8cca1a6b8af391bb53c1a2db74e5d1cef6ddced95d4b2062edc6"},
-    {file = "importlib_metadata-4.11.3.tar.gz", hash = "sha256:ea4c597ebf37142f827b8f39299579e31685c31d3a438b59f469406afd0f2539"},
 ]
 "iniconfig 1.1.1" = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
@@ -506,13 +485,13 @@ content_hash = "sha256:be67cdeb953645bd98173a30d9025f1e7c23a3dd132a5a967b98f1c09
     {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
     {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
 ]
-"slack-bolt 1.13.2" = [
-    {file = "slack_bolt-1.13.2-py2.py3-none-any.whl", hash = "sha256:b9a49ed2f0ff511a83a7b97f4c87b37c79058a6d0187d7436eeb242c51558631"},
-    {file = "slack_bolt-1.13.2.tar.gz", hash = "sha256:6a51578d5e53d108632f4e7cb5567fb319964718c8187eb03a17318e99f94db6"},
+"slack-bolt 1.14.0" = [
+    {file = "slack_bolt-1.14.0-py2.py3-none-any.whl", hash = "sha256:86acccfb668ae57d553126cfb46ab694893e71aa7d3f78af597464d4148b4fcb"},
+    {file = "slack_bolt-1.14.0.tar.gz", hash = "sha256:2b3e41249616925325e3788b224440d8a70757885fd364d59eacc71db798a7ee"},
 ]
-"slack-sdk 3.16.1" = [
-    {file = "slack_sdk-3.16.1-py2.py3-none-any.whl", hash = "sha256:701b66ee028614f94cc4771f21b2319c55686e786bd2888e7454e45b5f9e5299"},
-    {file = "slack_sdk-3.16.1.tar.gz", hash = "sha256:8eb8ba74f04b2246a1f506e1a5e9b30b4e0547daecdcbec63ac2bdd444fd305f"},
+"slack-sdk 3.16.2" = [
+    {file = "slack_sdk-3.16.2-py2.py3-none-any.whl", hash = "sha256:4427fc4495e8f7a559708114e23e177defb175dc8adc7a0502a5cd4487c01ba9"},
+    {file = "slack_sdk-3.16.2.tar.gz", hash = "sha256:db9a98d9c75b6fa1cc927f2009dc974e6fde19a76b355d54a42fd21cd38ebd67"},
 ]
 "sqlalchemy 1.4.36" = [
     {file = "SQLAlchemy-1.4.36-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:81e53bd383c2c33de9d578bfcc243f559bd3801a0e57f2bcc9a943c790662e0c"},
@@ -563,8 +542,4 @@ content_hash = "sha256:be67cdeb953645bd98173a30d9025f1e7c23a3dd132a5a967b98f1c09
 "werkzeug 2.1.2" = [
     {file = "Werkzeug-2.1.2-py3-none-any.whl", hash = "sha256:72a4b735692dd3135217911cbeaa1be5fa3f62bffb8745c5215420a03dc55255"},
     {file = "Werkzeug-2.1.2.tar.gz", hash = "sha256:1ce08e8093ed67d638d63879fd1ba3735817f7a80de3674d293f5984f25fb6e6"},
-]
-"zipp 3.8.0" = [
-    {file = "zipp-3.8.0-py3-none-any.whl", hash = "sha256:c4f6e5bbf48e74f7a38e7cc5b0480ff42b0ae5178957d564d18932525d5cf099"},
-    {file = "zipp-3.8.0.tar.gz", hash = "sha256:56bf8aadb83c24db6c4b577e13de374ccfb67da2078beba1d037c17980bf43ad"},
 ]
