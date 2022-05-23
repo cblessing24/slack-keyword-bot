@@ -7,11 +7,11 @@ from typing import Any, Generic, Optional, Type, TypeVar
 from ..adapters.repository import AbstractRepository, SQLAlchemyRepository
 
 R = TypeVar("R", bound="AbstractRepository")
-U = TypeVar("U", bound="AbstractUnitOfWork[Any]")
 
 
 class AbstractUnitOfWork(ABC, Generic[R]):
     keywords: R
+    U = TypeVar("U", bound="AbstractUnitOfWork[R]")  # pyright: ignore
 
     def __enter__(self: U) -> U:
         return self
