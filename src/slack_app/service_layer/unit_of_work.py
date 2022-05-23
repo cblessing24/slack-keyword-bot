@@ -4,6 +4,10 @@ from abc import ABC, abstractmethod
 from types import TracebackType
 from typing import Any, Generic, Optional, Type, TypeVar
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from .. import config
 from ..adapters.repository import AbstractRepository, SQLAlchemyRepository
 
 R = TypeVar("R", bound="AbstractRepository")
@@ -30,8 +34,11 @@ class AbstractUnitOfWork(ABC, Generic[R]):
         pass
 
 
+DEFAULT_SESSION_FACTORY = sessionmaker(bind=create_engine(config.get_postgres_uri()))
+
+
 class SQLAlchemyUnitOfWork(AbstractUnitOfWork[SQLAlchemyRepository]):
-    def __init__(self, session_factory: Any) -> None:
+    def __init__(self, session_factory: Any = DEFAULT_SESSION_FACTORY) -> None:
         self.session_factory = session_factory
         self._session: Optional[Any] = None
 
