@@ -9,9 +9,10 @@ def add_keyword(uow: AbstractUnitOfWork[R], channel: str, user: str, word: str) 
 
 
 def get_subscribers(uow: AbstractUnitOfWork[R], channel: str, author: str, text: str) -> set[str]:
-    keywords = uow.keywords.get(model.Channel(channel))
-    message = model.Message(model.Channel(channel), model.User(author), model.Text(text))
-    return set(model.get_subscribers(message, keywords))
+    with uow:
+        keywords = uow.keywords.get(model.Channel(channel))
+        message = model.Message(model.Channel(channel), model.User(author), model.Text(text))
+        return set(model.get_subscribers(message, keywords))
 
 
 def list_keywords(uow: AbstractUnitOfWork[R], channel: str, subscriber: str) -> set[str]:
