@@ -8,11 +8,11 @@ from slack_app.domain.model import Channel, Keyword
 class AbstractRepository(ABC):
     @abstractmethod
     def add(self, keyword: Keyword) -> None:
-        pass
+        """Add a keyword to the repository."""
 
     @abstractmethod
     def get(self, channel: Channel) -> list[Keyword]:
-        pass
+        """Get all keywords for a channel."""
 
 
 class SQLAlchemyRepository(AbstractRepository):
