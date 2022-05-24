@@ -21,6 +21,7 @@ license = {text = "GPL-3.0-or-later"}
 [tool.pdm]
 [tool.pdm.scripts]
 start = "flask run --port 80 --host 0.0.0.0"
+coverage = "pytest --cov --cov-report=html:reports/coverage.html"
 
 [tool.pdm.dev-dependencies]
 dev = [
@@ -29,6 +30,7 @@ dev = [
     "black>=22.3.0",
     "isort>=5.10.1",
     "pynvim>=0.4.3",
+    "pytest-cov>=3.0.0",
 ]
 [build-system]
 requires = ["pdm-pep517>=0.12.0"]
@@ -58,3 +60,7 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
