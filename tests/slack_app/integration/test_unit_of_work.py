@@ -40,3 +40,9 @@ def test_rolls_back_on_error(session_factory: Any, create_keyword: KeywordCreato
 
     session = session_factory()
     assert list(session.execute("SELECT * FROM 'keyword'")) == []
+
+
+def test_session_only_available_in_context(session_factory: Any) -> None:
+    uow = SQLAlchemyUnitOfWork(session_factory)
+    with pytest.raises(RuntimeError, match="not available outside of context"):
+        _ = uow.session
