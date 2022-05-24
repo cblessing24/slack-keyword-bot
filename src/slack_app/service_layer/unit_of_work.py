@@ -27,11 +27,11 @@ class AbstractUnitOfWork(ABC, Generic[R]):
 
     @abstractmethod
     def commit(self) -> None:
-        pass
+        """Commit the unit of work."""
 
     @abstractmethod
     def rollback(self) -> None:
-        pass
+        """Rollback the unit of work."""
 
 
 DEFAULT_SESSION_FACTORY = sessionmaker(bind=create_engine(config.get_postgres_uri()))
@@ -45,7 +45,7 @@ class SQLAlchemyUnitOfWork(AbstractUnitOfWork[SQLAlchemyRepository]):
     @property
     def session(self) -> Any:
         if self._session is None:
-            raise RuntimeError("Session is not initialized")
+            raise RuntimeError("Session not available outside of context")
         return self._session
 
     def __enter__(self) -> SQLAlchemyUnitOfWork:
