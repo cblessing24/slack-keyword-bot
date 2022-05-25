@@ -18,4 +18,12 @@ def get_subscribers(uow: AbstractUnitOfWork[R], channel: str, author: str, text:
 def list_keywords(uow: AbstractUnitOfWork[R], channel: str, subscriber: str) -> set[str]:
     with uow:
         keywords = uow.keywords.get(model.Channel(channel))
-        return {k.word for k in keywords if k.subscriber == model.User(subscriber)}
+        return {k.word for k in keywords if k.subscriber == model.User(subscriber) and k.active}
+
+
+def deactivate_keyword(uow: AbstractUnitOfWork[R], channel: str, subscriber: str, word: str) -> None:
+    with uow:
+        keywords = uow.keywords.get(model.Channel(channel))
+        keyword = next(k for k in keywords if k.subscriber == model.User(subscriber) and k.word == model.Word(word))
+        keyword.active = False
+        uow.commit()
