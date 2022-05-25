@@ -9,14 +9,16 @@ from slack_app.domain.model import Channel, Keyword, User, Word
 
 
 class KeywordCreator(Protocol):
-    def __call__(self, channel: str = ..., subscriber: str = ..., word: str = ...) -> Keyword:
+    def __call__(self, channel: str = ..., subscriber: str = ..., word: str = ..., active: bool = ...) -> Keyword:
         ...
 
 
 @pytest.fixture
 def create_keyword() -> KeywordCreator:
-    def create(channel: str = "mychannel", subscriber: str = "bob", word: str = "hello") -> Keyword:
-        return Keyword(channel=Channel(channel), subscriber=User(subscriber), word=Word(word))
+    def create(
+        channel: str = "mychannel", subscriber: str = "bob", word: str = "hello", active: bool = True
+    ) -> Keyword:
+        return Keyword(channel=Channel(channel), subscriber=User(subscriber), word=Word(word), active=active)
 
     return create
 
