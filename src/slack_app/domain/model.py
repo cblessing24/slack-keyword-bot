@@ -13,6 +13,7 @@ class Keyword:
     channel: Channel
     subscriber: User
     word: Word
+    active: bool = True
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,8 @@ class Message:
 
 def get_subscribers(message: Message, keywords: Iterable[Keyword]) -> Iterator[User]:
     for keyword in keywords:
+        if not keyword.active:
+            continue
         if keyword.subscriber == message.author:
             continue
         if keyword in message:
