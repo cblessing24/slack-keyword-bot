@@ -39,4 +39,5 @@ def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: Me
     in_keyword = create_keyword(channel="mychannel", subscriber="bob", word="hello")
     out_keyword = create_keyword(channel="mychannel", subscriber="bob", word="goodbye")
     author_keyword = create_keyword(channel="mychannel", subscriber="john", word="hello")
-    assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword])) == [User("bob")]
+    inactive_keyword = create_keyword(channel="mychannel", subscriber="alice", word="hello", active=False)
+    assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword, inactive_keyword])) == [User("bob")]
