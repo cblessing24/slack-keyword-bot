@@ -10,7 +10,7 @@ from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
 from ..adapters.orm import start_mappers
-from ..service_layer.services import add_keyword, get_subscribers, list_keywords
+from ..service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
 from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -54,6 +54,15 @@ def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) 
     keywords = list_keywords(SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"])
     kewywords_text = "\n".join(f"    - {k}" for k in keywords)
     respond(f"Your keywords in this channel:\n{kewywords_text}")
+
+
+@app.command("/notify-remove")
+def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
+    ack()
+    deactivate_keyword(
+        SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"], word=command["text"]
+    )
+    respond(f"You will no longer be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 
 
 flask_app = Flask(__name__)
