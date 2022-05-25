@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Table
+from sqlalchemy import Boolean, Column, Integer, String, Table
 from sqlalchemy.orm import registry
 
 from ..domain.model import Keyword
@@ -13,6 +13,7 @@ keyword = Table(
     Column("channel", String(255)),
     Column("subscriber", String(255)),
     Column("word", String(255)),
+    Column("active", Boolean),
 )
 
 
