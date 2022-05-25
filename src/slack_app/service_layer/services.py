@@ -16,5 +16,6 @@ def get_subscribers(uow: AbstractUnitOfWork[R], channel: str, author: str, text:
 
 
 def list_keywords(uow: AbstractUnitOfWork[R], channel: str, subscriber: str) -> set[str]:
-    keywords = uow.keywords.get(model.Channel(channel))
-    return {k.word for k in keywords if k.subscriber == model.User(subscriber)}
+    with uow:
+        keywords = uow.keywords.get(model.Channel(channel))
+        return {k.word for k in keywords if k.subscriber == model.User(subscriber)}
