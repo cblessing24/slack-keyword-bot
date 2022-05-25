@@ -1,10 +1,13 @@
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, pool
 
 from alembic import context
 from slack_app import config
 from slack_app.adapters import orm
+
+load_dotenv()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
