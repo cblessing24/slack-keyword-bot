@@ -41,8 +41,8 @@ def event_message(event: Mapping[str, Any], client: WebClient) -> None:
         client.chat_postMessage(channel=subscriber, text=text)
 
 
-@app.command("/notify")
-def command_notify(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
+@app.command("/notify-create")
+def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
     add_keyword(SQLAlchemyUnitOfWork(), channel=command["channel_id"], user=command["user_id"], word=command["text"])
     respond(f"You will be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
