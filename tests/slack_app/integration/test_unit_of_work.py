@@ -14,7 +14,7 @@ def test_can_insert_keyword(session_factory: Any, create_keyword: KeywordCreator
         uow.commit()
 
     session = session_factory()
-    assert list(session.execute("SELECT * FROM 'keyword'")) == [(1, "general", "bob", "hello")]
+    assert list(session.execute("SELECT * FROM 'keyword'")) == [(1, "general", "bob", "hello", True)]
 
 
 def test_rolls_back_changes_by_default(session_factory: Any, create_keyword: KeywordCreator) -> None:
