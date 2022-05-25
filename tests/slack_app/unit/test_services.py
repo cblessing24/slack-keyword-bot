@@ -4,7 +4,7 @@ from typing import Iterable, Optional
 
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, Keyword, User, Word
-from slack_app.service_layer.services import add_keyword, get_subscribers, list_keywords
+from slack_app.service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
 from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
 
@@ -68,3 +68,11 @@ def test_subscribers_are_returned() -> None:
         add_keyword(uow, *keyword)
     subscribers = get_subscribers(uow, channel="general", author="john", text="Goodbye World")
     assert subscribers == {"bob", "alice"}
+
+
+def test_keyword_can_be_deactivated() -> None:
+    uow = FakeUnitOfWork()
+    add_keyword(uow, channel="general", user="bob", word="hello")
+    deactivate_keyword(uow, channel="general", subscriber="bob", word="hello")
+    keywords = list_keywords(uow, channel="general", subscriber="bob")
+    assert keywords == set()
