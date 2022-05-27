@@ -5,39 +5,29 @@ from typing import Iterable, Optional
 import pytest
 
 from slack_app.adapters.repository import AbstractRepository
-from slack_app.domain.model import ChannelName, Keyword, User, Word
+from slack_app.domain.model import Channel, ChannelName
 from slack_app.service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
 from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 class FakeRepository(AbstractRepository):
-    def __init__(self, keywords: Optional[set[Keyword]] = None) -> None:
-        self.keywords = keywords if keywords is not None else set()
+    def __init__(self, channels: Optional[set[Channel]] = None) -> None:
+        self.channels = channels if channels is not None else set()
 
-    def add(self, keyword: Keyword) -> None:
-        self.keywords.add(keyword)
+    def add(self, channel: Channel) -> None:
+        self.channels.add(channel)
 
-    def get(self, channel_name: ChannelName) -> list[Keyword]:
-        return [k for k in self.keywords if k.channel_name == channel_name]
-
-    @staticmethod
-    def for_keywords(keywords: Iterable[tuple[str, str, str]]) -> FakeRepository:
-        return FakeRepository(
-            {
-                Keyword(
-                    channel_name=ChannelName(channel),
-                    subscriber=User(subscriber),
-                    word=Word(word),
-                )
-                for channel, subscriber, word in keywords
-            }
-        )
+    def get(self, channel_name: ChannelName) -> Channel | None:
+        try:
+            return next(c for c in self.channels if c.channel_name == channel_name)
+        except StopIteration:
+            return None
 
 
 class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
     def __init__(self) -> None:
         self.committed = False
-        self.keywords = FakeRepository()
+        self.channels = FakeRepository()
 
     def commit(self) -> None:
         self.committed = True
@@ -82,5 +72,6 @@ def test_keyword_can_be_deactivated() -> None:
 
 def test_error_gets_raised_if_unknown_keyword_is_deactivated() -> None:
     uow = FakeUnitOfWork()
+    add_keyword(uow, channel_name="general", user="john", word="hello")
     with pytest.raises(ValueError, match="Unknown keyword"):
         deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")

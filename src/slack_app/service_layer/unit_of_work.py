@@ -14,7 +14,7 @@ R = TypeVar("R", bound="AbstractRepository")
 
 
 class AbstractUnitOfWork(ABC, Generic[R]):
-    keywords: R
+    channels: R
     U = TypeVar("U", bound="AbstractUnitOfWork[R]")  # pyright: ignore
 
     def __enter__(self: U) -> U:
@@ -50,7 +50,7 @@ class SQLAlchemyUnitOfWork(AbstractUnitOfWork[SQLAlchemyRepository]):
 
     def __enter__(self) -> SQLAlchemyUnitOfWork:
         session = self.session_factory()
-        self.keywords = SQLAlchemyRepository(session)
+        self.channels = SQLAlchemyRepository(session)
         self._session = session
         return super().__enter__()
 
