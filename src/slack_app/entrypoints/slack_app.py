@@ -52,6 +52,9 @@ def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond
 def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
     keywords = list_keywords(SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"])
+    if not keywords:
+        respond("You are not subscribed to any keywords in this channel.")
+        return
     kewywords_text = "\n".join(f"    - {k}" for k in keywords)
     respond(f"Your keywords in this channel:\n{kewywords_text}")
 
