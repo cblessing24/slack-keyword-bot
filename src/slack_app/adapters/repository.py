@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy.orm import Session
 
-from slack_app.domain.model import Channel, Keyword
+from slack_app.domain.model import ChannelName, Keyword
 
 
 class AbstractRepository(ABC):
@@ -11,7 +11,7 @@ class AbstractRepository(ABC):
         """Add a keyword to the repository."""
 
     @abstractmethod
-    def get(self, channel: Channel) -> list[Keyword]:
+    def get(self, channel_name: ChannelName) -> list[Keyword]:
         """Get all keywords for a channel."""
 
 
@@ -22,5 +22,5 @@ class SQLAlchemyRepository(AbstractRepository):
     def add(self, keyword: Keyword) -> None:
         self.session.add(keyword)
 
-    def get(self, channel: Channel) -> list[Keyword]:
-        return self.session.query(Keyword).filter_by(channel=channel).all()  # type: ignore[no-any-return]
+    def get(self, channel_name: ChannelName) -> list[Keyword]:
+        return self.session.query(Keyword).filter_by(channel_name=channel_name).all()  # type: ignore[no-any-return]

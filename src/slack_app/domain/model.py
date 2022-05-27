@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import Iterable, Iterator, NewType
 
-Channel = NewType("Channel", str)
+ChannelName = NewType("ChannelName", str)
 User = NewType("User", str)
 Word = NewType("Word", str)
 Text = NewType("Text", str)
@@ -10,7 +10,7 @@ Text = NewType("Text", str)
 
 @dataclass(unsafe_hash=True)
 class Keyword:
-    channel: Channel
+    channel_name: ChannelName
     subscriber: User
     word: Word
     active: bool = True
@@ -18,7 +18,7 @@ class Keyword:
 
 @dataclass(frozen=True)
 class Message:
-    channel: Channel
+    channel_name: ChannelName
     author: User
     text: Text
 

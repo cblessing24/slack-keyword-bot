@@ -34,7 +34,7 @@ def log_request(logger: logging.Logger, body: Mapping[str, Any], next: Callable[
 @app.event("message")
 def event_message(event: Mapping[str, Any], client: WebClient) -> None:
     for subscriber in get_subscribers(
-        SQLAlchemyUnitOfWork(), channel=event["channel"], author=event["user"], text=event["text"]
+        SQLAlchemyUnitOfWork(), channel_name=event["channel"], author=event["user"], text=event["text"]
     ):
         quoted = "> " + "\n> ".join(event["text"].split("\n"))
         text = f"<@{event['user']}> mentioned a keyword in <#{event['channel']}>:\n{quoted}"
@@ -44,14 +44,16 @@ def event_message(event: Mapping[str, Any], client: WebClient) -> None:
 @app.command("/notify-create")
 def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    add_keyword(SQLAlchemyUnitOfWork(), channel=command["channel_id"], user=command["user_id"], word=command["text"])
+    add_keyword(
+        SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], user=command["user_id"], word=command["text"]
+    )
     respond(f"You will be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 
 
 @app.command("/notify-list")
 def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    keywords = list_keywords(SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"])
+    keywords = list_keywords(SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"])
     if not keywords:
         respond("You are not subscribed to any keywords in this channel.")
         return
@@ -64,7 +66,10 @@ def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond
     ack()
     try:
         deactivate_keyword(
-            SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"], word=command["text"]
+            SQLAlchemyUnitOfWork(),
+            channel_name=command["channel_id"],
+            subscriber=command["user_id"],
+            word=command["text"],
         )
     except ValueError:
         respond(f"Can not remove keyword: You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!")

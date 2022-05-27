@@ -10,7 +10,7 @@ from ..conftest import KeywordCreator
 def test_can_insert_keyword(session_factory: Any, create_keyword: KeywordCreator) -> None:
     uow = SQLAlchemyUnitOfWork(session_factory)
     with uow:
-        uow.keywords.add(create_keyword(channel="general", subscriber="bob", word="hello"))
+        uow.keywords.add(create_keyword(channel_name="general", subscriber="bob", word="hello"))
         uow.commit()
 
     session = session_factory()
