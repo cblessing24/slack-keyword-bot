@@ -24,6 +24,9 @@ def list_keywords(uow: AbstractUnitOfWork[R], channel: str, subscriber: str) -> 
 def deactivate_keyword(uow: AbstractUnitOfWork[R], channel: str, subscriber: str, word: str) -> None:
     with uow:
         keywords = uow.keywords.get(model.Channel(channel))
-        keyword = next(k for k in keywords if k.subscriber == model.User(subscriber) and k.word == model.Word(word))
+        try:
+            keyword = next(k for k in keywords if k.subscriber == model.User(subscriber) and k.word == model.Word(word))
+        except StopIteration:
+            raise ValueError("Unknown keyword")
         keyword.active = False
         uow.commit()
