@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Iterable, Optional
 
+import pytest
+
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, Keyword, User, Word
 from slack_app.service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
@@ -76,3 +78,9 @@ def test_keyword_can_be_deactivated() -> None:
     deactivate_keyword(uow, channel="general", subscriber="bob", word="hello")
     keywords = list_keywords(uow, channel="general", subscriber="bob")
     assert keywords == set()
+
+
+def test_error_gets_raised_if_unknown_keyword_is_deactivated() -> None:
+    uow = FakeUnitOfWork()
+    with pytest.raises(ValueError, match="Unknown keyword"):
+        deactivate_keyword(uow, channel="general", subscriber="bob", word="hello")
