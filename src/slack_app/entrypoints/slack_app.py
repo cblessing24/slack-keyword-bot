@@ -59,9 +59,13 @@ def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) 
 @app.command("/notify-remove")
 def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    deactivate_keyword(
-        SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"], word=command["text"]
-    )
+    try:
+        deactivate_keyword(
+            SQLAlchemyUnitOfWork(), channel=command["channel_id"], subscriber=command["user_id"], word=command["text"]
+        )
+    except ValueError:
+        respond(f"Can not remove keyword: You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!")
+        return
     respond(f"You will no longer be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 
 
