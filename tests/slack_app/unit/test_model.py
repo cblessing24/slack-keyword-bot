@@ -4,7 +4,7 @@ from typing import Protocol
 
 import pytest
 
-from slack_app.domain.model import Channel, ChannelName, Message, Text, User, get_subscribers
+from slack_app.domain.model import Channel, ChannelName, Message, Text, User
 
 from ..conftest import KeywordCreator
 
@@ -40,7 +40,8 @@ def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: Me
     out_keyword = create_keyword(channel_name="mychannel", subscriber="bob", word="goodbye")
     author_keyword = create_keyword(channel_name="mychannel", subscriber="john", word="hello")
     inactive_keyword = create_keyword(channel_name="mychannel", subscriber="alice", word="hello", active=False)
-    assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword, inactive_keyword])) == [User("bob")]
+    channel = Channel(ChannelName("mychannel"), keywords={in_keyword, out_keyword, author_keyword, inactive_keyword})
+    assert list(channel.get_subscribers(message)) == [User("bob")]
 
 
 def test_channel_gets_initialized_with_empty_set_by_default() -> None:

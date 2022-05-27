@@ -15,6 +15,15 @@ class Channel:
         self.channel_name = channel_name
         self.keywords = set(keywords) if keywords is not None else set()
 
+    def get_subscribers(self, message: Message) -> Iterator[User]:
+        for keyword in self.keywords:
+            if not keyword.active:
+                continue
+            if keyword.subscriber == message.author:
+                continue
+            if keyword in message:
+                yield keyword.subscriber
+
 
 @dataclass(unsafe_hash=True)
 class Keyword:
@@ -33,13 +42,3 @@ class Message:
     def __contains__(self, word: Keyword) -> bool:
         pattern = re.compile(r"\b" + word.word + r"\b")
         return pattern.search(self.text) is not None
-
-
-def get_subscribers(message: Message, keywords: Iterable[Keyword]) -> Iterator[User]:
-    for keyword in keywords:
-        if not keyword.active:
-            continue
-        if keyword.subscriber == message.author:
-            continue
-        if keyword in message:
-            yield keyword.subscriber
