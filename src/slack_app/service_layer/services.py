@@ -16,7 +16,7 @@ def get_subscribers(uow: AbstractUnitOfWork[R], channel_name: str, author: str, 
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
-            return set()
+            raise ValueError("Unknown channel")
         message = model.Message(model.ChannelName(channel_name), model.User(author), model.Text(text))
         return set(model.get_subscribers(message, channel.keywords))
 
@@ -25,7 +25,7 @@ def list_keywords(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
-            return set()
+            raise ValueError("Unknown channel")
         return {k.word for k in channel.keywords if k.subscriber == model.User(subscriber) and k.active}
 
 

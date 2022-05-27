@@ -50,6 +50,12 @@ def test_added_keyword_gets_committed() -> None:
     assert uow.committed
 
 
+def test_list_keywords_errors_for_unknown_channe() -> None:
+    uow = FakeUnitOfWork()
+    with pytest.raises(ValueError, match="Unknown channel"):
+        list_keywords(uow, channel_name="general", subscriber="bob")
+
+
 def test_subscribers_are_returned() -> None:
     uow = FakeUnitOfWork()
     in_keyword = ("general", "bob", "World")
@@ -62,6 +68,12 @@ def test_subscribers_are_returned() -> None:
     assert subscribers == {"bob", "alice"}
 
 
+def test_get_subscribers_errors_for_unknown_channel() -> None:
+    uow = FakeUnitOfWork()
+    with pytest.raises(ValueError, match="Unknown channel"):
+        get_subscribers(uow, channel_name="general", author="john", text="Goodbye World")
+
+
 def test_keyword_can_be_deactivated() -> None:
     uow = FakeUnitOfWork()
     add_keyword(uow, channel_name="general", user="bob", word="hello")
@@ -70,7 +82,13 @@ def test_keyword_can_be_deactivated() -> None:
     assert keywords == set()
 
 
-def test_error_gets_raised_if_unknown_keyword_is_deactivated() -> None:
+def test_deactivate_keyword_errors_for_unknown_channel() -> None:
+    uow = FakeUnitOfWork()
+    with pytest.raises(ValueError, match="Unknown channel"):
+        deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+
+
+def test_deactivate_keyword_errors_for_unknown_keyword() -> None:
     uow = FakeUnitOfWork()
     add_keyword(uow, channel_name="general", user="john", word="hello")
     with pytest.raises(ValueError, match="Unknown keyword"):
