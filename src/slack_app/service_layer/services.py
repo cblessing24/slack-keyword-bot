@@ -8,7 +8,7 @@ def add_keyword(uow: AbstractUnitOfWork[R], channel_name: str, user: str, word: 
         if not channel:
             channel = model.Channel(model.ChannelName(channel_name))
             uow.channels.add(channel)
-        channel.keywords.append(model.Keyword(model.ChannelName(channel_name), model.User(user), model.Word(word)))
+        channel.keywords.add(model.Keyword(model.ChannelName(channel_name), model.User(user), model.Word(word)))
         uow.commit()
 
 

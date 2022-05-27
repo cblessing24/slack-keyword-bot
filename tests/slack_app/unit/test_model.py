@@ -43,6 +43,6 @@ def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: Me
     assert list(get_subscribers(message, [in_keyword, out_keyword, author_keyword, inactive_keyword])) == [User("bob")]
 
 
-def test_channel_gets_initialized_with_empty_list_by_default() -> None:
+def test_channel_gets_initialized_with_empty_set_by_default() -> None:
     channel = Channel(ChannelName("mychannel"))
-    assert channel.keywords == []
+    assert channel.keywords == set()

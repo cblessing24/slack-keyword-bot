@@ -13,7 +13,7 @@ Text = NewType("Text", str)
 class Channel:
     def __init__(self, channel_name: ChannelName, keywords: Optional[Iterable[Keyword]] = None) -> None:
         self.channel_name = channel_name
-        self.keywords = list(keywords) if keywords is not None else []
+        self.keywords = set(keywords) if keywords is not None else set()
 
 
 @dataclass(unsafe_hash=True)

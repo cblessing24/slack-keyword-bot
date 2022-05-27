@@ -21,4 +21,6 @@ keyword = Table(
 
 def start_mappers() -> None:
     mapper_registry.map_imperatively(Keyword, keyword)
-    mapper_registry.map_imperatively(Channel, channel, properties={"keywords": relationship(Keyword)})
+    mapper_registry.map_imperatively(
+        Channel, channel, properties={"keywords": relationship(Keyword, collection_class=set)}
+    )
