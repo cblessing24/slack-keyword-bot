@@ -47,3 +47,12 @@ def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: Me
 def test_channel_gets_initialized_with_empty_set_by_default() -> None:
     channel = Channel(ChannelName("mychannel"))
     assert channel.keywords == set()
+
+
+def test_channel_repr(create_keyword: KeywordCreator) -> None:
+    keywords = {create_keyword(channel_name="mychannel", subscriber="anna", word="hello", active=True)}
+    channel = Channel(ChannelName("mychannel"), keywords=keywords)
+    assert repr(channel) == (
+        "Channel(channel_name='mychannel', keywords={Keyword(channel_name='mychannel', "
+        "subscriber='anna', word='hello', active=True)})"
+    )

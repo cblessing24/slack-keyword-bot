@@ -24,6 +24,9 @@ class Channel:
             if keyword in message:
                 yield keyword.subscriber
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(channel_name='{self.channel_name}', keywords={self.keywords})"
+
 
 @dataclass(unsafe_hash=True)
 class Keyword:
