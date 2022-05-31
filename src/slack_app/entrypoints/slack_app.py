@@ -10,7 +10,7 @@ from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
 from ..adapters.orm import start_mappers
-from ..service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
+from ..service_layer.services import deactivate_keyword, get_subscribers, list_keywords, subscribe
 from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -44,7 +44,7 @@ def event_message(event: Mapping[str, Any], client: WebClient) -> None:
 @app.command("/notify-create")
 def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    add_keyword(
+    subscribe(
         SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"], word=command["text"]
     )
     respond(f"You will be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")

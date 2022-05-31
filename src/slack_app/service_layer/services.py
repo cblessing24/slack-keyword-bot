@@ -2,7 +2,7 @@ from ..domain import model
 from .unit_of_work import AbstractUnitOfWork, R
 
 
-def add_keyword(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
+def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:

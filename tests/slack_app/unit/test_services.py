@@ -6,7 +6,7 @@ import pytest
 
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, ChannelName
-from slack_app.service_layer.services import add_keyword, deactivate_keyword, get_subscribers, list_keywords
+from slack_app.service_layer.services import deactivate_keyword, get_subscribers, list_keywords, subscribe
 from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
 
@@ -38,14 +38,14 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
 
 def test_keyword_gets_added() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+    subscribe(uow, channel_name="general", subscriber="bob", word="hello")
     keywords = list_keywords(uow, channel_name="general", subscriber="bob")
     assert keywords == {"hello"}
 
 
 def test_added_keyword_gets_committed() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+    subscribe(uow, channel_name="general", subscriber="bob", word="hello")
     assert issubclass(FakeUnitOfWork, AbstractUnitOfWork)
     assert uow.committed
 
@@ -63,7 +63,7 @@ def test_subscribers_are_returned() -> None:
     author_keyword = ("general", "john", "Goodbye")
     keywords = [in_keyword, out_keyword, author_keyword]
     for keyword in keywords:
-        add_keyword(uow, *keyword)
+        subscribe(uow, *keyword)
     subscribers = get_subscribers(uow, channel_name="general", author="john", text="Goodbye World")
     assert subscribers == {"bob", "alice"}
 
@@ -76,7 +76,7 @@ def test_get_subscribers_errors_for_unknown_channel() -> None:
 
 def test_keyword_can_be_deactivated() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+    subscribe(uow, channel_name="general", subscriber="bob", word="hello")
     deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
     keywords = list_keywords(uow, channel_name="general", subscriber="bob")
     assert keywords == set()
@@ -90,6 +90,6 @@ def test_deactivate_keyword_errors_for_unknown_channel() -> None:
 
 def test_deactivate_keyword_errors_for_unknown_keyword() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", subscriber="john", word="hello")
+    subscribe(uow, channel_name="general", subscriber="john", word="hello")
     with pytest.raises(ValueError, match="Unknown keyword"):
         deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
