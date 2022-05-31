@@ -38,14 +38,14 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
 
 def test_keyword_gets_added() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", user="bob", word="hello")
+    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
     keywords = list_keywords(uow, channel_name="general", subscriber="bob")
     assert keywords == {"hello"}
 
 
 def test_added_keyword_gets_committed() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", user="bob", word="hello")
+    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
     assert issubclass(FakeUnitOfWork, AbstractUnitOfWork)
     assert uow.committed
 
@@ -76,7 +76,7 @@ def test_get_subscribers_errors_for_unknown_channel() -> None:
 
 def test_keyword_can_be_deactivated() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", user="bob", word="hello")
+    add_keyword(uow, channel_name="general", subscriber="bob", word="hello")
     deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
     keywords = list_keywords(uow, channel_name="general", subscriber="bob")
     assert keywords == set()
@@ -90,6 +90,6 @@ def test_deactivate_keyword_errors_for_unknown_channel() -> None:
 
 def test_deactivate_keyword_errors_for_unknown_keyword() -> None:
     uow = FakeUnitOfWork()
-    add_keyword(uow, channel_name="general", user="john", word="hello")
+    add_keyword(uow, channel_name="general", subscriber="john", word="hello")
     with pytest.raises(ValueError, match="Unknown keyword"):
         deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")

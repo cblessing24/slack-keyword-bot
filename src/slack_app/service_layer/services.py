@@ -2,13 +2,13 @@ from ..domain import model
 from .unit_of_work import AbstractUnitOfWork, R
 
 
-def add_keyword(uow: AbstractUnitOfWork[R], channel_name: str, user: str, word: str) -> None:
+def add_keyword(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
             channel = model.Channel(model.ChannelName(channel_name))
             uow.channels.add(channel)
-        channel.keywords.add(model.Keyword(model.ChannelName(channel_name), model.User(user), model.Word(word)))
+        channel.keywords.add(model.Keyword(model.ChannelName(channel_name), model.User(subscriber), model.Word(word)))
         uow.commit()
 
 
