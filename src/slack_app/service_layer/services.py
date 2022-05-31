@@ -12,7 +12,7 @@ def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, wo
         uow.commit()
 
 
-def get_subscribers(uow: AbstractUnitOfWork[R], channel_name: str, author: str, text: str) -> set[str]:
+def list_subscribers(uow: AbstractUnitOfWork[R], channel_name: str, author: str, text: str) -> set[str]:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:

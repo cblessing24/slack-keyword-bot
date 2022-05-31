@@ -10,7 +10,7 @@ from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
 from ..adapters.orm import start_mappers
-from ..service_layer.services import deactivate_keyword, get_subscribers, list_keywords, subscribe
+from ..service_layer.services import deactivate_keyword, list_keywords, list_subscribers, subscribe
 from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ def log_request(logger: logging.Logger, body: Mapping[str, Any], next: Callable[
 
 @app.event("message")
 def event_message(event: Mapping[str, Any], client: WebClient) -> None:
-    for subscriber in get_subscribers(
+    for subscriber in list_subscribers(
         SQLAlchemyUnitOfWork(), channel_name=event["channel"], author=event["user"], text=event["text"]
     ):
         quoted = "> " + "\n> ".join(event["text"].split("\n"))
