@@ -10,7 +10,7 @@ from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
 from ..adapters.orm import start_mappers
-from ..service_layer.services import deactivate_keyword, list_keywords, list_subscribers, subscribe
+from ..service_layer.services import deactivate_keyword, list_subscribers, list_subscriptions, subscribe
 from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -53,7 +53,9 @@ def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond
 @app.command("/notify-list")
 def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    keywords = list_keywords(SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"])
+    keywords = list_subscriptions(
+        SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
+    )
     if not keywords:
         respond("You are not subscribed to any keywords in this channel.")
         return

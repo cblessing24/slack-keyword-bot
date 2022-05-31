@@ -21,7 +21,7 @@ def list_subscribers(uow: AbstractUnitOfWork[R], channel_name: str, author: str,
         return set(channel.get_subscribers(message))
 
 
-def list_keywords(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str) -> set[str]:
+def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str) -> set[str]:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
