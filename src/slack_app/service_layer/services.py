@@ -20,7 +20,7 @@ def list_subscribers(uow: AbstractUnitOfWork[R], channel_name: str, author: str,
         if not channel:
             raise ValueError("Unknown channel")
         message = model.Message(model.ChannelName(channel_name), model.User(author), model.Text(text))
-        return set(channel.get_subscribers(message))
+        return set(channel.find_subscribed(message))
 
 
 def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str) -> set[str]:

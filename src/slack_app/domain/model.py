@@ -15,7 +15,7 @@ class Channel:
         self.channel_name = channel_name
         self.subscriptions = set(subscriptions) if subscriptions is not None else set()
 
-    def get_subscribers(self, message: Message) -> Iterator[User]:
+    def find_subscribed(self, message: Message) -> Iterator[User]:
         for subscription in self.subscriptions:
             if subscription.unsubscribed:
                 continue

@@ -45,7 +45,7 @@ def test_subscribers_are_returned(create_subscription: SubscriptionCreator, crea
     channel = Channel(
         ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
     )
-    assert list(channel.get_subscribers(message)) == [User("bob")]
+    assert list(channel.find_subscribed(message)) == [User("bob")]
 
 
 def test_channel_gets_initialized_with_empty_set_by_default() -> None:
