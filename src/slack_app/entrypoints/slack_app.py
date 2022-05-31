@@ -10,7 +10,7 @@ from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
 from ..adapters.orm import start_mappers
-from ..service_layer.services import deactivate_keyword, list_subscribers, list_subscriptions, subscribe
+from ..service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
 from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -67,7 +67,7 @@ def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) 
 def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
     try:
-        deactivate_keyword(
+        unsubscribe(
             SQLAlchemyUnitOfWork(),
             channel_name=command["channel_id"],
             subscriber=command["user_id"],

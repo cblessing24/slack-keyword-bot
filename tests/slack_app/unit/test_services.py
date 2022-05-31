@@ -6,7 +6,7 @@ import pytest
 
 from slack_app.adapters.repository import AbstractRepository
 from slack_app.domain.model import Channel, ChannelName
-from slack_app.service_layer.services import deactivate_keyword, list_subscribers, list_subscriptions, subscribe
+from slack_app.service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
 from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
 
@@ -77,7 +77,7 @@ def test_get_subscribers_errors_for_unknown_channel() -> None:
 def test_keyword_can_be_deactivated() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="bob", word="hello")
-    deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+    unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")
     keywords = list_subscriptions(uow, channel_name="general", subscriber="bob")
     assert keywords == set()
 
@@ -85,11 +85,11 @@ def test_keyword_can_be_deactivated() -> None:
 def test_deactivate_keyword_errors_for_unknown_channel() -> None:
     uow = FakeUnitOfWork()
     with pytest.raises(ValueError, match="Unknown channel"):
-        deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+        unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")
 
 
 def test_deactivate_keyword_errors_for_unknown_keyword() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="john", word="hello")
     with pytest.raises(ValueError, match="Unknown keyword"):
-        deactivate_keyword(uow, channel_name="general", subscriber="bob", word="hello")
+        unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")

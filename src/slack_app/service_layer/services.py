@@ -29,7 +29,7 @@ def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber
         return {k.word for k in channel.keywords if k.subscriber == model.User(subscriber) and k.active}
 
 
-def deactivate_keyword(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
+def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
