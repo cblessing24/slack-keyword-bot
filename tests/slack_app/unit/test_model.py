@@ -39,8 +39,10 @@ def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: Me
     in_keyword = create_keyword(channel_name="mychannel", subscriber="bob", word="hello")
     out_keyword = create_keyword(channel_name="mychannel", subscriber="bob", word="goodbye")
     author_keyword = create_keyword(channel_name="mychannel", subscriber="john", word="hello")
-    inactive_keyword = create_keyword(channel_name="mychannel", subscriber="alice", word="hello", active=False)
-    channel = Channel(ChannelName("mychannel"), keywords={in_keyword, out_keyword, author_keyword, inactive_keyword})
+    unsubscribed_keyword = create_keyword(channel_name="mychannel", subscriber="alice", word="hello", unsubscribed=True)
+    channel = Channel(
+        ChannelName("mychannel"), keywords={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
+    )
     assert list(channel.get_subscribers(message)) == [User("bob")]
 
 
@@ -50,9 +52,9 @@ def test_channel_gets_initialized_with_empty_set_by_default() -> None:
 
 
 def test_channel_repr(create_keyword: KeywordCreator) -> None:
-    keywords = {create_keyword(channel_name="mychannel", subscriber="anna", word="hello", active=True)}
+    keywords = {create_keyword(channel_name="mychannel", subscriber="anna", word="hello", unsubscribed=False)}
     channel = Channel(ChannelName("mychannel"), keywords=keywords)
     assert repr(channel) == (
         "Channel(channel_name='mychannel', keywords={Keyword(channel_name='mychannel', "
-        "subscriber='anna', word='hello', active=True)})"
+        "subscriber='anna', word='hello', unsubscribed=False)})"
     )

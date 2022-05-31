@@ -15,7 +15,7 @@ keyword = Table(
     Column("channel_name", ForeignKey("channel.channel_name")),
     Column("subscriber", String(255)),
     Column("word", String(255)),
-    Column("active", Boolean),
+    Column("unsubscribed", Boolean),
 )
 
 
