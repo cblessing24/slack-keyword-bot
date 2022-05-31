@@ -4,7 +4,7 @@ from typing import Protocol
 
 import pytest
 
-from slack_app.domain.model import Channel, ChannelName, Message, Text, User
+from slack_app.domain.model import Channel, ChannelName, Keyword, Message, Text, User
 
 from ..conftest import SubscriptionCreator
 
@@ -22,18 +22,16 @@ def create_msg() -> MessageCreator:
     return create
 
 
-def test_message_contains_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
-    assert create_subscription(keyword="World") in create_msg(text="Hello World!")
+def test_message_contains_keyword(create_msg: MessageCreator) -> None:
+    assert Keyword("World") in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
-    assert create_subscription(keyword="Goodbye") not in create_msg(text="Hello World!")
+def test_message_does_not_contain_keyword(create_msg: MessageCreator) -> None:
+    assert Keyword("Goodbye") not in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_partial_keyword(
-    create_subscription: SubscriptionCreator, create_msg: MessageCreator
-) -> None:
-    assert create_subscription(keyword="Good") not in create_msg(text="Goodbye World!")
+def test_message_does_not_contain_partial_keyword(create_msg: MessageCreator) -> None:
+    assert Keyword("Good") not in create_msg(text="Goodbye World!")
 
 
 def test_subscribers_are_returned(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:

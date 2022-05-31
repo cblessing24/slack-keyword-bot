@@ -21,7 +21,7 @@ class Channel:
                 continue
             if subscription.subscriber == message.author:
                 continue
-            if subscription in message:
+            if subscription.keyword in message:
                 yield subscription.subscriber
 
     def __repr__(self) -> str:
@@ -42,6 +42,6 @@ class Message:
     author: User
     text: Text
 
-    def __contains__(self, word: Subscription) -> bool:
-        pattern = re.compile(r"\b" + word.keyword + r"\b")
+    def __contains__(self, keyword: Keyword) -> bool:
+        pattern = re.compile(r"\b" + keyword + r"\b")
         return pattern.search(self.text) is not None
