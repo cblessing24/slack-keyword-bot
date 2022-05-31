@@ -14,7 +14,7 @@ subscription = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("channel_name", ForeignKey("channel.channel_name")),
     Column("subscriber", String(255)),
-    Column("word", String(255)),
+    Column("keyword", String(255)),
     Column("unsubscribed", Boolean),
 )
 
