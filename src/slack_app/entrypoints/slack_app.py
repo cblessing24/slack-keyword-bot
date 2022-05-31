@@ -45,7 +45,10 @@ def event_message(event: Mapping[str, Any], client: WebClient) -> None:
 def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
     subscribe(
-        SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"], word=command["text"]
+        SQLAlchemyUnitOfWork(),
+        channel_name=command["channel_id"],
+        subscriber=command["user_id"],
+        keyword=command["text"],
     )
     respond(f"You will be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 
@@ -71,7 +74,7 @@ def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond
             SQLAlchemyUnitOfWork(),
             channel_name=command["channel_id"],
             subscriber=command["user_id"],
-            word=command["text"],
+            keyword=command["text"],
         )
     except ValueError:
         respond(

@@ -23,26 +23,26 @@ def create_msg() -> MessageCreator:
 
 
 def test_message_contains_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
-    assert create_subscription(word="World") in create_msg(text="Hello World!")
+    assert create_subscription(keyword="World") in create_msg(text="Hello World!")
 
 
 def test_message_does_not_contain_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
-    assert create_subscription(word="Goodbye") not in create_msg(text="Hello World!")
+    assert create_subscription(keyword="Goodbye") not in create_msg(text="Hello World!")
 
 
 def test_message_does_not_contain_partial_keyword(
     create_subscription: SubscriptionCreator, create_msg: MessageCreator
 ) -> None:
-    assert create_subscription(word="Good") not in create_msg(text="Goodbye World!")
+    assert create_subscription(keyword="Good") not in create_msg(text="Goodbye World!")
 
 
 def test_subscribers_are_returned(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
     message = create_msg(channel_name="mychannel", author="john", text="hello world")
-    in_keyword = create_subscription(channel_name="mychannel", subscriber="bob", word="hello")
-    out_keyword = create_subscription(channel_name="mychannel", subscriber="bob", word="goodbye")
-    author_keyword = create_subscription(channel_name="mychannel", subscriber="john", word="hello")
+    in_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="hello")
+    out_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="goodbye")
+    author_keyword = create_subscription(channel_name="mychannel", subscriber="john", keyword="hello")
     unsubscribed_keyword = create_subscription(
-        channel_name="mychannel", subscriber="alice", word="hello", unsubscribed=True
+        channel_name="mychannel", subscriber="alice", keyword="hello", unsubscribed=True
     )
     channel = Channel(
         ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
@@ -56,9 +56,11 @@ def test_channel_gets_initialized_with_empty_set_by_default() -> None:
 
 
 def test_channel_repr(create_subscription: SubscriptionCreator) -> None:
-    subscriptions = {create_subscription(channel_name="mychannel", subscriber="anna", word="hello", unsubscribed=False)}
+    subscriptions = {
+        create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello", unsubscribed=False)
+    }
     channel = Channel(ChannelName("mychannel"), subscriptions=subscriptions)
     assert repr(channel) == (
         "Channel(channel_name='mychannel', subscriptions={Subscription(channel_name='mychannel', "
-        "subscriber='anna', word='hello', unsubscribed=False)})"
+        "subscriber='anna', keyword='hello', unsubscribed=False)})"
     )

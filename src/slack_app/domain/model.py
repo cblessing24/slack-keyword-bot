@@ -6,7 +6,7 @@ from typing import Iterable, Iterator, NewType, Optional
 
 ChannelName = NewType("ChannelName", str)
 User = NewType("User", str)
-Word = NewType("Word", str)
+Keyword = NewType("Keyword", str)
 Text = NewType("Text", str)
 
 
@@ -32,7 +32,7 @@ class Channel:
 class Subscription:
     channel_name: ChannelName
     subscriber: User
-    word: Word
+    keyword: Keyword
     unsubscribed: bool = False
 
 
@@ -43,5 +43,5 @@ class Message:
     text: Text
 
     def __contains__(self, word: Subscription) -> bool:
-        pattern = re.compile(r"\b" + word.word + r"\b")
+        pattern = re.compile(r"\b" + word.keyword + r"\b")
         return pattern.search(self.text) is not None

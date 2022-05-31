@@ -2,14 +2,14 @@ from ..domain import model
 from .unit_of_work import AbstractUnitOfWork, R
 
 
-def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
+def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, keyword: str) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
             channel = model.Channel(model.ChannelName(channel_name))
             uow.channels.add(channel)
         channel.subscriptions.add(
-            model.Subscription(model.ChannelName(channel_name), model.User(subscriber), model.Word(word))
+            model.Subscription(model.ChannelName(channel_name), model.User(subscriber), model.Keyword(keyword))
         )
         uow.commit()
 
@@ -28,10 +28,12 @@ def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
             raise ValueError("Unknown channel")
-        return {k.word for k in channel.subscriptions if k.subscriber == model.User(subscriber) and not k.unsubscribed}
+        return {
+            s.keyword for s in channel.subscriptions if s.subscriber == model.User(subscriber) and not s.unsubscribed
+        }
 
 
-def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
+def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, keyword: str) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
@@ -40,7 +42,7 @@ def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, 
             subscription = next(
                 s
                 for s in channel.subscriptions
-                if s.subscriber == model.User(subscriber) and s.word == model.Word(word)
+                if s.subscriber == model.User(subscriber) and s.keyword == model.Keyword(keyword)
             )
         except StopIteration:
             raise ValueError("Unknown subscription")
