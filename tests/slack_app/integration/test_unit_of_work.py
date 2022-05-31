@@ -5,7 +5,7 @@ import pytest
 from slack_app.domain.model import Channel, ChannelName
 from slack_app.service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
-from ..conftest import KeywordCreator
+from ..conftest import SubscriptionCreator
 
 
 def test_can_add_channel(session_factory: Any) -> None:

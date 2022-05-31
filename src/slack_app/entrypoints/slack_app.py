@@ -53,14 +53,14 @@ def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond
 @app.command("/notify-list")
 def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    keywords = list_subscriptions(
+    subscriptions = list_subscriptions(
         SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
     )
-    if not keywords:
-        respond("You are not subscribed to any keywords in this channel.")
+    if not subscriptions:
+        respond("You have no subscriptions in this channel.")
         return
-    kewywords_text = "\n".join(f"    - {k}" for k in keywords)
-    respond(f"Your keywords in this channel:\n{kewywords_text}")
+    kewywords_text = "\n".join(f"    - {k}" for k in subscriptions)
+    respond(f"Your subscriptions in this channel:\n{kewywords_text}")
 
 
 @app.command("/notify-remove")
@@ -74,7 +74,10 @@ def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond
             word=command["text"],
         )
     except ValueError:
-        respond(f"Can not remove keyword: You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!")
+        respond(
+            f"Can not remove subscription: "
+            "You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!"
+        )
         return
     respond(f"You will no longer be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 

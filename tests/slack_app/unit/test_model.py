@@ -6,7 +6,7 @@ import pytest
 
 from slack_app.domain.model import Channel, ChannelName, Message, Text, User
 
-from ..conftest import KeywordCreator
+from ..conftest import SubscriptionCreator
 
 
 class MessageCreator(Protocol):
@@ -22,39 +22,43 @@ def create_msg() -> MessageCreator:
     return create
 
 
-def test_message_contains_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
-    assert create_keyword(word="World") in create_msg(text="Hello World!")
+def test_message_contains_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
+    assert create_subscription(word="World") in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
-    assert create_keyword(word="Goodbye") not in create_msg(text="Hello World!")
+def test_message_does_not_contain_keyword(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
+    assert create_subscription(word="Goodbye") not in create_msg(text="Hello World!")
 
 
-def test_message_does_not_contain_partial_keyword(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
-    assert create_keyword(word="Good") not in create_msg(text="Goodbye World!")
+def test_message_does_not_contain_partial_keyword(
+    create_subscription: SubscriptionCreator, create_msg: MessageCreator
+) -> None:
+    assert create_subscription(word="Good") not in create_msg(text="Goodbye World!")
 
 
-def test_subscribers_are_returned(create_keyword: KeywordCreator, create_msg: MessageCreator) -> None:
+def test_subscribers_are_returned(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
     message = create_msg(channel_name="mychannel", author="john", text="hello world")
-    in_keyword = create_keyword(channel_name="mychannel", subscriber="bob", word="hello")
-    out_keyword = create_keyword(channel_name="mychannel", subscriber="bob", word="goodbye")
-    author_keyword = create_keyword(channel_name="mychannel", subscriber="john", word="hello")
-    unsubscribed_keyword = create_keyword(channel_name="mychannel", subscriber="alice", word="hello", unsubscribed=True)
+    in_keyword = create_subscription(channel_name="mychannel", subscriber="bob", word="hello")
+    out_keyword = create_subscription(channel_name="mychannel", subscriber="bob", word="goodbye")
+    author_keyword = create_subscription(channel_name="mychannel", subscriber="john", word="hello")
+    unsubscribed_keyword = create_subscription(
+        channel_name="mychannel", subscriber="alice", word="hello", unsubscribed=True
+    )
     channel = Channel(
-        ChannelName("mychannel"), keywords={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
+        ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
     )
     assert list(channel.get_subscribers(message)) == [User("bob")]
 
 
 def test_channel_gets_initialized_with_empty_set_by_default() -> None:
     channel = Channel(ChannelName("mychannel"))
-    assert channel.keywords == set()
+    assert channel.subscriptions == set()
 
 
-def test_channel_repr(create_keyword: KeywordCreator) -> None:
-    keywords = {create_keyword(channel_name="mychannel", subscriber="anna", word="hello", unsubscribed=False)}
-    channel = Channel(ChannelName("mychannel"), keywords=keywords)
+def test_channel_repr(create_subscription: SubscriptionCreator) -> None:
+    subscriptions = {create_subscription(channel_name="mychannel", subscriber="anna", word="hello", unsubscribed=False)}
+    channel = Channel(ChannelName("mychannel"), subscriptions=subscriptions)
     assert repr(channel) == (
-        "Channel(channel_name='mychannel', keywords={Keyword(channel_name='mychannel', "
+        "Channel(channel_name='mychannel', subscriptions={Subscription(channel_name='mychannel', "
         "subscriber='anna', word='hello', unsubscribed=False)})"
     )

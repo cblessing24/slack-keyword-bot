@@ -36,14 +36,14 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
         pass
 
 
-def test_keyword_gets_added() -> None:
+def test_subscription_gets_added() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="bob", word="hello")
-    keywords = list_subscriptions(uow, channel_name="general", subscriber="bob")
-    assert keywords == {"hello"}
+    subscriptions = list_subscriptions(uow, channel_name="general", subscriber="bob")
+    assert subscriptions == {"hello"}
 
 
-def test_added_keyword_gets_committed() -> None:
+def test_added_subscription_gets_committed() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="bob", word="hello")
     assert issubclass(FakeUnitOfWork, AbstractUnitOfWork)
@@ -61,9 +61,8 @@ def test_subscribers_are_returned() -> None:
     in_keyword = ("general", "bob", "World")
     out_keyword = ("general", "alice", "World")
     author_keyword = ("general", "john", "Goodbye")
-    keywords = [in_keyword, out_keyword, author_keyword]
-    for keyword in keywords:
-        subscribe(uow, *keyword)
+    for subscription in [in_keyword, out_keyword, author_keyword]:
+        subscribe(uow, *subscription)
     subscribers = list_subscribers(uow, channel_name="general", author="john", text="Goodbye World")
     assert subscribers == {"bob", "alice"}
 
@@ -74,22 +73,22 @@ def test_get_subscribers_errors_for_unknown_channel() -> None:
         list_subscribers(uow, channel_name="general", author="john", text="Goodbye World")
 
 
-def test_keyword_can_be_deactivated() -> None:
+def test_can_unsubscribe() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="bob", word="hello")
     unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")
-    keywords = list_subscriptions(uow, channel_name="general", subscriber="bob")
-    assert keywords == set()
+    subscriptions = list_subscriptions(uow, channel_name="general", subscriber="bob")
+    assert subscriptions == set()
 
 
-def test_deactivate_keyword_errors_for_unknown_channel() -> None:
+def test_unsubscribe_errors_for_unknown_channel() -> None:
     uow = FakeUnitOfWork()
     with pytest.raises(ValueError, match="Unknown channel"):
         unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")
 
 
-def test_deactivate_keyword_errors_for_unknown_keyword() -> None:
+def test_unsubscribe_errors_for_unknown_subscription() -> None:
     uow = FakeUnitOfWork()
     subscribe(uow, channel_name="general", subscriber="john", word="hello")
-    with pytest.raises(ValueError, match="Unknown keyword"):
+    with pytest.raises(ValueError, match="Unknown subscription"):
         unsubscribe(uow, channel_name="general", subscriber="bob", word="hello")

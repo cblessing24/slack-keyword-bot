@@ -5,22 +5,22 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import clear_mappers, sessionmaker
 
 from slack_app.adapters.orm import metadata, start_mappers
-from slack_app.domain.model import ChannelName, Keyword, User, Word
+from slack_app.domain.model import ChannelName, Subscription, User, Word
 
 
-class KeywordCreator(Protocol):
+class SubscriptionCreator(Protocol):
     def __call__(
         self, channel_name: str = ..., subscriber: str = ..., word: str = ..., unsubscribed: bool = ...
-    ) -> Keyword:
+    ) -> Subscription:
         ...
 
 
 @pytest.fixture
-def create_keyword() -> KeywordCreator:
+def create_subscription() -> SubscriptionCreator:
     def create(
         channel_name: str = "mychannel", subscriber: str = "bob", word: str = "hello", unsubscribed: bool = False
-    ) -> Keyword:
-        return Keyword(
+    ) -> Subscription:
+        return Subscription(
             channel_name=ChannelName(channel_name),
             subscriber=User(subscriber),
             word=Word(word),

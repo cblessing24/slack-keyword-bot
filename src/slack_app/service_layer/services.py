@@ -8,7 +8,9 @@ def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, wo
         if not channel:
             channel = model.Channel(model.ChannelName(channel_name))
             uow.channels.add(channel)
-        channel.keywords.add(model.Keyword(model.ChannelName(channel_name), model.User(subscriber), model.Word(word)))
+        channel.subscriptions.add(
+            model.Subscription(model.ChannelName(channel_name), model.User(subscriber), model.Word(word))
+        )
         uow.commit()
 
 
@@ -26,7 +28,7 @@ def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
             raise ValueError("Unknown channel")
-        return {k.word for k in channel.keywords if k.subscriber == model.User(subscriber) and not k.unsubscribed}
+        return {k.word for k in channel.subscriptions if k.subscriber == model.User(subscriber) and not k.unsubscribed}
 
 
 def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, word: str) -> None:
@@ -35,10 +37,12 @@ def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, 
         if not channel:
             raise ValueError("Unknown channel")
         try:
-            keyword = next(
-                k for k in channel.keywords if k.subscriber == model.User(subscriber) and k.word == model.Word(word)
+            subscription = next(
+                s
+                for s in channel.subscriptions
+                if s.subscriber == model.User(subscriber) and s.word == model.Word(word)
             )
         except StopIteration:
-            raise ValueError("Unknown keyword")
-        keyword.unsubscribed = True
+            raise ValueError("Unknown subscription")
+        subscription.unsubscribed = True
         uow.commit()
