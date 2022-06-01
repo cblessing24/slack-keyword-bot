@@ -28,9 +28,7 @@ def list_subscriptions(uow: AbstractUnitOfWork[R], channel_name: str, subscriber
         channel = uow.channels.get(model.ChannelName(channel_name))
         if not channel:
             raise ValueError("Unknown channel")
-        return {
-            s.keyword for s in channel.subscriptions if s.subscriber == model.User(subscriber) and not s.unsubscribed
-        }
+        return {s.keyword for s in channel.subscriptions if s.subscriber == model.User(subscriber)}
 
 
 def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, keyword: str) -> None:
@@ -46,5 +44,5 @@ def unsubscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, 
             )
         except StopIteration:
             raise ValueError("Unknown subscription")
-        subscription.unsubscribed = True
+        channel.subscriptions.remove(subscription)
         uow.commit()

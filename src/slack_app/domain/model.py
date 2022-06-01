@@ -17,8 +17,6 @@ class Channel:
 
     def find_subscribed(self, message: Message) -> Iterator[User]:
         for subscription in self.subscriptions:
-            if subscription.unsubscribed:
-                continue
             if subscription.subscriber == message.author:
                 continue
             if subscription.keyword in message:
@@ -33,7 +31,6 @@ class Subscription:
     channel_name: ChannelName
     subscriber: User
     keyword: Keyword
-    unsubscribed: bool = False
 
 
 @dataclass(frozen=True)

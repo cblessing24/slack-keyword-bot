@@ -39,12 +39,7 @@ def test_subscribers_are_returned(create_subscription: SubscriptionCreator, crea
     in_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="hello")
     out_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="goodbye")
     author_keyword = create_subscription(channel_name="mychannel", subscriber="john", keyword="hello")
-    unsubscribed_keyword = create_subscription(
-        channel_name="mychannel", subscriber="alice", keyword="hello", unsubscribed=True
-    )
-    channel = Channel(
-        ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword, unsubscribed_keyword}
-    )
+    channel = Channel(ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword})
     assert list(channel.find_subscribed(message)) == [User("bob")]
 
 
@@ -54,11 +49,9 @@ def test_channel_gets_initialized_with_empty_set_by_default() -> None:
 
 
 def test_channel_repr(create_subscription: SubscriptionCreator) -> None:
-    subscriptions = {
-        create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello", unsubscribed=False)
-    }
+    subscriptions = {create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")}
     channel = Channel(ChannelName("mychannel"), subscriptions=subscriptions)
     assert repr(channel) == (
         "Channel(channel_name='mychannel', subscriptions={Subscription(channel_name='mychannel', "
-        "subscriber='anna', keyword='hello', unsubscribed=False)})"
+        "subscriber='anna', keyword='hello')})"
     )
