@@ -32,10 +32,15 @@ def log_request(logger: logging.Logger, body: Mapping[str, Any], next: Callable[
 
 
 @app.event("message")
-def event_message(event: Mapping[str, Any], client: WebClient) -> None:
-    for subscriber in list_subscribers(
-        SQLAlchemyUnitOfWork(), channel_name=event["channel"], author=event["user"], text=event["text"]
-    ):
+def event_message(logger: logging.Logger, event: Mapping[str, Any], client: WebClient) -> None:
+    try:
+        subscribers = list_subscribers(
+            SQLAlchemyUnitOfWork(), channel_name=event["channel"], author=event["user"], text=event["text"]
+        )
+    except ValueError as e:
+        logger.warning(e)
+        return
+    for subscriber in subscribers:
         quoted = "> " + "\n> ".join(event["text"].split("\n"))
         text = f"<@{event['user']}> mentioned a keyword in <#{event['channel']}>:\n{quoted}"
         client.chat_postMessage(channel=subscriber, text=text)
@@ -56,11 +61,15 @@ def command_notify_create(ack: Ack, command: Mapping[str, Any], respond: Respond
 @app.command("/notify-list")
 def command_notify_list(ack: Ack, command: Mapping[str, Any], respond: Respond) -> None:
     ack()
-    subscriptions = list_subscriptions(
-        SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
-    )
+    no_subscriptions_msg = f"You have no subscriptions in <#{command['channel_id']}>."
+    try:
+        subscriptions = list_subscriptions(
+            SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
+        )
+    except ValueError:
+        respond(no_subscriptions_msg)
     if not subscriptions:
-        respond("You have no subscriptions in this channel.")
+        respond(no_subscriptions_msg)
         return
     kewywords_text = "\n".join(f"    - {k}" for k in subscriptions)
     respond(f"Your subscriptions in this channel:\n{kewywords_text}")
@@ -77,10 +86,7 @@ def command_notify_remove(ack: Ack, command: Mapping[str, Any], respond: Respond
             keyword=command["text"],
         )
     except ValueError:
-        respond(
-            f"Can not remove subscription: "
-            "You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!"
-        )
+        respond(f"You are not subscribed to '{command['text']}' in <#{command['channel_id']}>!")
         return
     respond(f"You will no longer be notified if '{command['text']}' is mentioned in <#{command['channel_id']}>!")
 
