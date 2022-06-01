@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Literal, Mapping, Optional, Protocol, TypedDict
+import os
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, TypedDict
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -31,7 +32,7 @@ class Event(TypedDict):
     text: str
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=getattr(logging, os.environ.get("LOGLEVEL", "WARNING")))
 load_dotenv()
 start_mappers()
 
