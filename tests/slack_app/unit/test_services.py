@@ -50,6 +50,13 @@ def test_added_subscription_gets_committed() -> None:
     assert uow.committed
 
 
+def test_resubscribing_errors() -> None:
+    uow = FakeUnitOfWork()
+    subscribe(uow, channel_name="general", subscriber="bob", keyword="hello")
+    with pytest.raises(ValueError, match="Already subscribed"):
+        subscribe(uow, channel_name="general", subscriber="bob", keyword="hello")
+
+
 def test_list_keywords_errors_for_unknown_channe() -> None:
     uow = FakeUnitOfWork()
     with pytest.raises(ValueError, match="Unknown channel"):
