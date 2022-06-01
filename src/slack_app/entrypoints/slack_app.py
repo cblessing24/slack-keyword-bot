@@ -82,6 +82,7 @@ def command_notify_list(ack: Ack, command: Command, respond: Respond) -> None:
         )
     except ValueError:
         respond(no_subscriptions_msg)
+        return
     if not subscriptions:
         respond(no_subscriptions_msg)
         return
