@@ -1,0 +1,8 @@
+[Unit]                                                                                                                                                                                                                                         │drwxr-xr-x 4 chris chris  4096 May 25 14:59 alembic/
+Description=Slack App                                                                                                                                                                                                                          │-rw-r--r-- 1 chris chris  2915 May 24 15:02 alembic.ini
+
+[Service]                                                                                                                                                                                                                                      │-rw-rw-r-- 1 chris chris   575 Jun  1 14:01 .env
+ExecStart=/opt/slack-app/scripts/start.sh                                                                                                                                                                                                      │-rw-r--r-- 1 chris chris  3086 May 12 12:26 .gitignore
+
+[Install]                                                                                                                                                                                                                                      │-rw-r--r-- 1 chris chris 62575 May 24 15:02 pdm.lock
+WantedBy=multi-user.target
