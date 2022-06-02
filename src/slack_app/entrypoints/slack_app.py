@@ -60,8 +60,8 @@ def event_message(logger: logging.Logger, event: Event, client: WebClient) -> No
         client.chat_postMessage(channel=subscriber, text=text)
 
 
-@app.command("/notify-create")
-def command_notify_create(ack: Ack, command: Command, respond: Respond) -> None:
+@app.command("/keyword-subscribe")
+def command_keyword_subscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
     subscribe(
@@ -73,10 +73,10 @@ def command_notify_create(ack: Ack, command: Command, respond: Respond) -> None:
     respond(f"You will be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
 
-@app.command("/notify-list")
-def command_notify_list(ack: Ack, command: Command, respond: Respond) -> None:
+@app.command("/keyword-list")
+def command_keyword_list(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
-    no_subscriptions_msg = f"You have no subscriptions in <#{command['channel_id']}>."
+    no_subscriptions_msg = f"You are not subscribed to any keywords in <#{command['channel_id']}>."
     try:
         subscriptions = list_subscriptions(
             SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
@@ -91,8 +91,8 @@ def command_notify_list(ack: Ack, command: Command, respond: Respond) -> None:
     respond(f"Your subscriptions in this channel:\n{kewywords_text}")
 
 
-@app.command("/notify-remove")
-def command_notify_remove(ack: Ack, command: Command, respond: Respond) -> None:
+@app.command("/keyword-unsubscribe")
+def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
     try:
