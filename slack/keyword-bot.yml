@@ -1,0 +1,49 @@
+display_information:
+  name: keyword-bot
+  description: This bot lets you subscribe to channel specific keywords
+  background_color: "#2c2d30"
+features:
+  bot_user:
+    display_name: keyword-bot
+    always_online: false
+  slash_commands:
+    - command: /keyword-subscribe
+      url: http://134.76.17.73/slack/events
+      description: Subscribe to a keyword
+      usage_hint: "[keyword]"
+      should_escape: false
+    - command: /keyword-list
+      url: http://134.76.17.73/slack/events
+      description: List your keywords in this channel
+      should_escape: false
+    - command: /keyword-unsubscribe
+      url: http://134.76.17.73/slack/events
+      description: Unsubscribe from a keyword
+      usage_hint: "[keyword]"
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+      - incoming-webhook
+      - app_mentions:read
+      - commands
+settings:
+  event_subscriptions:
+    request_url: http://134.76.17.73/slack/events
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+  interactivity:
+    is_enabled: true
+    request_url: http://134.76.17.73/slack/events
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
