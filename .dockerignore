@@ -1,0 +1,14 @@
+.coverage
+.env
+.git/
+.gitignore
+.mypy_cache/
+.pytest_cache/
+.venv/
+Dockerfile
+pyrightconfig.json
+reports/
+scripts/
+slack/
+systemd/
+tests/
