@@ -1,23 +1,36 @@
 from __future__ import annotations
 
 import logging
-import os
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, TypedDict
 
-from dotenv import load_dotenv
-from flask import Flask, request
-from flask.wrappers import Response
 from slack_bolt import App
-from slack_bolt.adapter.flask import SlackRequestHandler
 
-from ..adapters.orm import start_mappers
-from ..service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
-from ..service_layer.unit_of_work import SQLAlchemyUnitOfWork
+from ...service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
+from ...service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
     from slack_bolt.context.ack import Ack
     from slack_bolt.context.respond import Respond
     from slack_sdk.web.client import WebClient
+
+
+@dataclass(frozen=True)
+class Component:
+    type: str
+    function: Any
+
+    def register(self, app: App) -> None:
+        getattr(app, self.type)(self.function)
+
+
+@dataclass(frozen=True)
+class Listener(Component):
+    args: Optional[list[Any]] = field(default_factory=list)
+    kwargs: dict[str, Any] = field(default_factory=dict)
+
+    def register(self, app: App) -> None:
+        getattr(app, self.type)(*self.args, **self.kwargs)(self.function)
 
 
 class Command(TypedDict):
@@ -32,20 +45,17 @@ class Event(TypedDict):
     text: str
 
 
-logging.basicConfig(level=getattr(logging, os.environ.get("LOGLEVEL", "WARNING")))
-load_dotenv()
-start_mappers()
-
-app = App()
+components: list[Component] = []
 
 
-@app.middleware
 def log_request(logger: logging.Logger, body: Mapping[str, Any], next: Callable[[], None]) -> None:
     logger.debug(body)
     return next()
 
 
-@app.event("message")
+components.append(Component("middleware", log_request))
+
+
 def event_message(logger: logging.Logger, event: Event, client: WebClient) -> None:
     try:
         subscribers = list_subscribers(
@@ -60,7 +70,9 @@ def event_message(logger: logging.Logger, event: Event, client: WebClient) -> No
         client.chat_postMessage(channel=subscriber, text=text)
 
 
-@app.command("/keyword-subscribe")
+components.append(Listener("event", event_message, args=["message"]))
+
+
 def command_keyword_subscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
@@ -73,7 +85,9 @@ def command_keyword_subscribe(ack: Ack, command: Command, respond: Respond) -> N
     respond(f"You will be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
 
-@app.command("/keyword-list")
+components.append(Listener("command", command_keyword_subscribe, args=["/keyword-subscribe"]))
+
+
 def command_keyword_list(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     no_subscriptions_msg = f"You are not subscribed to any keywords in <#{command['channel_id']}>."
@@ -91,7 +105,9 @@ def command_keyword_list(ack: Ack, command: Command, respond: Respond) -> None:
     respond(f"Your subscriptions in this channel:\n{kewywords_text}")
 
 
-@app.command("/keyword-unsubscribe")
+components.append(Listener("command", command_keyword_list, args=["/keyword-list"]))
+
+
 def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
@@ -108,10 +124,4 @@ def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) ->
     respond(f"You will no longer be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
-
-
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events() -> Response:
-    return handler.handle(request)  # type: ignore[no-any-return]
+components.append(Listener("command", command_keyword_unsubscribe, args=["/keyword-unsubscribe"]))
