@@ -1,0 +1,44 @@
+display_information:
+  name: keyword-bot
+  description: This bot lets you subscribe to channel specific keywords
+  background_color: "#2c2d30"
+features:
+  bot_user:
+    display_name: keyword-bot
+    always_online: false
+  slash_commands:
+    - command: /keyword-subscribe
+      description: Subscribe to a keyword
+      usage_hint: "[keyword]"
+      should_escape: false
+    - command: /keyword-list
+      description: List your keywords in this channel
+      should_escape: false
+    - command: /keyword-unsubscribe
+      description: Unsubscribe from a keyword
+      usage_hint: "[keyword]"
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+      - incoming-webhook
+      - app_mentions:read
+      - commands
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
