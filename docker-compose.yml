@@ -1,0 +1,18 @@
+services:
+  keyword-bot:
+    build: .
+    environment:
+      - DB_HOST=postgres
+    env_file: .env
+    networks:
+      - slack-app
+  postgres:
+    image: postgres:14.3
+    environment:
+      - POSTGRES_USER=slack-app
+      - POSTGRES_PASSWORD=abc123
+      - POSTGRES_DB=slack-app
+    networks:
+      - slack-app
+networks:
+  slack-app: {}
