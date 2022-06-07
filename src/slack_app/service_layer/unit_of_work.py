@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from types import TracebackType
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any, Generator, Generic, Optional, Type, TypeVar
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from .. import config
 from ..adapters.repository import AbstractRepository, SQLAlchemyRepository
-from . import messagebus
+from ..domain import events
 
 R = TypeVar("R", bound="AbstractRepository")
 
@@ -28,13 +28,11 @@ class AbstractUnitOfWork(ABC, Generic[R]):
 
     def commit(self) -> None:
         self._commit()
-        self.publish_events()
 
-    def publish_events(self) -> None:
+    def collect_new_events(self) -> Generator[events.Event, None, None]:
         for channel in self.channels.seen:
             while channel.events:
-                event = channel.events.pop()
-                messagebus.handle(event)
+                yield channel.events.pop(0)
 
     @abstractmethod
     def _commit(self) -> None:

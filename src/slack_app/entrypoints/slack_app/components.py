@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, TypedDict
 
 from slack_bolt import App
 
-from ...service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
+from ...domain import events
+from ...service_layer import messagebus
 from ...service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
@@ -58,9 +59,10 @@ components.append(Component("middleware", log_request))
 
 def event_message(logger: logging.Logger, event: Event, client: WebClient) -> None:
     try:
-        subscribers = list_subscribers(
-            SQLAlchemyUnitOfWork(), channel_name=event["channel"], author=event["user"], text=event["text"]
-        )
+        subscribers = messagebus.handle(
+            events.SubscriberListRequired(channel_name=event["channel"], author=event["user"], text=event["text"]),
+            uow=SQLAlchemyUnitOfWork(),
+        )[0]
     except ValueError as e:
         logger.warning(e)
         return
@@ -76,11 +78,9 @@ components.append(Listener("event", event_message, args=["message"]))
 def command_keyword_subscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
-    subscribe(
-        SQLAlchemyUnitOfWork(),
-        channel_name=command["channel_id"],
-        subscriber=command["user_id"],
-        keyword=keyword,
+    messagebus.handle(
+        events.Subscribed(channel_name=command["channel_id"], subscriber=command["user_id"], keyword=keyword),
+        uow=SQLAlchemyUnitOfWork(),
     )
     respond(f"You will be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
@@ -92,9 +92,10 @@ def command_keyword_list(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     no_subscriptions_msg = f"You are not subscribed to any keywords in <#{command['channel_id']}>."
     try:
-        subscriptions = list_subscriptions(
-            SQLAlchemyUnitOfWork(), channel_name=command["channel_id"], subscriber=command["user_id"]
-        )
+        subscriptions = messagebus.handle(
+            events.SubscriptionsListRequired(channel_name=command["channel_id"], subscriber=command["user_id"]),
+            uow=SQLAlchemyUnitOfWork(),
+        )[0]
     except ValueError:
         respond(no_subscriptions_msg)
         return
@@ -112,11 +113,9 @@ def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) ->
     ack()
     keyword = command.get("text") or ""
     try:
-        unsubscribe(
+        messagebus.handle(
+            events.Unsubscribed(channel_name=command["channel_id"], subscriber=command["user_id"], keyword=keyword),
             SQLAlchemyUnitOfWork(),
-            channel_name=command["channel_id"],
-            subscriber=command["user_id"],
-            keyword=keyword,
         )
     except ValueError:
         respond(f"You are not subscribed to '{keyword}' in <#{command['channel_id']}>!")

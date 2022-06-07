@@ -1,4 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from typing import Any
+
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, event
 from sqlalchemy.orm import registry, relationship
 
 from ..domain.model import Channel, Subscription
@@ -25,3 +27,8 @@ def start_mappers() -> None:
         channel,
         properties={"subscriptions": relationship(Subscription, collection_class=set, cascade="all, delete-orphan")},
     )
+
+
+@event.listens_for(Channel, "load")  # type: ignore[misc]
+def receive_load(channel: Channel, _: Any) -> None:
+    channel.events = []

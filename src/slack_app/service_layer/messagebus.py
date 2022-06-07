@@ -1,27 +1,40 @@
-from typing import Callable, Protocol, Type, TypeVar, cast
+from typing import Any, Generic, Protocol, Type, TypeVar, cast
 
-from ..adapters import email
 from ..domain import events
+from . import handlers, unit_of_work
 
 
-def handle(event: events.Event) -> None:
-    for handler in HANDLERS[type(event)]:
-        handler(event)
+def handle(event: events.Event, uow: unit_of_work.AbstractUnitOfWork[unit_of_work.R]) -> list[Any]:
+    results: list[Any] = []
+    queue = [event]
+    while queue:
+        event = queue.pop(0)
+        for handler in HANDLERS[type(event)]:
+            results.append(handler(event, uow=uow))
+            queue.extend(uow.collect_new_events())
+    return results
 
 
-def send_already_subscribed_notification(event: events.AlreadySubscribed) -> None:
-    email.send_mail(
-        f"Hi {event.subscription.subscriber}, you are already subscribed "
-        f"to '{event.subscription.keyword}' in #{event.subscription.channel_name}!"
-    )
+E = TypeVar("E", bound=events.Event, contravariant=True)
 
 
-E = TypeVar("E", bound=events.Event)
+class Handler(Protocol, Generic[E]):
+    def __call__(self, event: E, uow: unit_of_work.AbstractUnitOfWork[unit_of_work.R]) -> Any:
+        ...
 
 
-class Handlers(Protocol):
-    def __getitem__(self, event: Type[E]) -> list[Callable[[E], None]]:
+class HandlerMap(Protocol):
+    def __getitem__(self, event: Type[E]) -> list[Handler[E]]:
         """Returns a list of callables that handle the given event."""
 
 
-HANDLERS = cast(Handlers, {events.AlreadySubscribed: [send_already_subscribed_notification]})
+HANDLERS = cast(
+    HandlerMap,
+    {
+        events.AlreadySubscribed: [],
+        events.Subscribed: [handlers.subscribe],
+        events.SubscriptionsListRequired: [handlers.list_subscriptions],
+        events.SubscriberListRequired: [handlers.list_subscribers],
+        events.Unsubscribed: [handlers.unsubscribe],
+    },
+)
