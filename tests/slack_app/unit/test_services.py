@@ -9,19 +9,7 @@ from slack_app.domain.model import Channel, ChannelName
 from slack_app.service_layer.services import list_subscribers, list_subscriptions, subscribe, unsubscribe
 from slack_app.service_layer.unit_of_work import AbstractUnitOfWork
 
-
-class FakeRepository(AbstractRepository):
-    def __init__(self, channels: Optional[set[Channel]] = None) -> None:
-        self.channels = channels if channels is not None else set()
-
-    def add(self, channel: Channel) -> None:
-        self.channels.add(channel)
-
-    def get(self, channel_name: ChannelName) -> Channel | None:
-        try:
-            return next(c for c in self.channels if c.channel_name == channel_name)
-        except StopIteration:
-            return None
+from .conftest import FakeRepository
 
 
 class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
