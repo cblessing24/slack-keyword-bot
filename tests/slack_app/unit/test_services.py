@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional
+from unittest import mock
 
 import pytest
 
@@ -17,7 +18,7 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
         self.committed = False
         self.channels = FakeRepository()
 
-    def commit(self) -> None:
+    def _commit(self) -> None:
         self.committed = True
 
     def rollback(self) -> None:
@@ -36,6 +37,14 @@ def test_added_subscription_gets_committed() -> None:
     subscribe(uow, channel_name="general", subscriber="bob", keyword="hello")
     assert issubclass(FakeUnitOfWork, AbstractUnitOfWork)
     assert uow.committed
+
+
+def test_sends_email_if_already_subscribed() -> None:
+    uow = FakeUnitOfWork()
+    subscribe(uow, channel_name="general", subscriber="bob", keyword="hello")
+    with mock.patch("slack_app.adapters.email.send_mail") as mock_send_mail:
+        subscribe(uow, channel_name="general", subscriber="bob", keyword="hello")
+        assert mock_send_mail.call_args == mock.call("Hi bob, you are already subscribed to 'hello' in #general!")
 
 
 def test_list_keywords_errors_for_unknown_channe() -> None:
