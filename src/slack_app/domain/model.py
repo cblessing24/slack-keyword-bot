@@ -4,6 +4,8 @@ import re
 from dataclasses import dataclass
 from typing import Iterable, Iterator, NewType, Optional
 
+from . import events
+
 ChannelName = NewType("ChannelName", str)
 User = NewType("User", str)
 Keyword = NewType("Keyword", str)
@@ -14,6 +16,13 @@ class Channel:
     def __init__(self, channel_name: ChannelName, subscriptions: Optional[Iterable[Subscription]] = None) -> None:
         self.channel_name = channel_name
         self.subscriptions = set(subscriptions) if subscriptions is not None else set()
+        self.events: list[events.Event] = []
+
+    def subscribe(self, subscription: Subscription) -> None:
+        if subscription in self.subscriptions:
+            self.events.append(events.AlreadySubscribed(subscription))
+            return
+        self.subscriptions.add(subscription)
 
     def find_subscribed(self, message: Message) -> Iterator[User]:
         for subscription in self.subscriptions:
