@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from .. import config
 from ..adapters.repository import AbstractRepository, SQLAlchemyRepository
+from . import messagebus
 
 R = TypeVar("R", bound="AbstractRepository")
 
@@ -25,8 +26,18 @@ class AbstractUnitOfWork(ABC, Generic[R]):
     ) -> None:
         self.rollback()
 
-    @abstractmethod
     def commit(self) -> None:
+        self._commit()
+        self.publish_events()
+
+    def publish_events(self) -> None:
+        for channel in self.channels.seen:
+            while channel.events:
+                event = channel.events.pop()
+                messagebus.handle(event)
+
+    @abstractmethod
+    def _commit(self) -> None:
         """Commit the unit of work."""
 
     @abstractmethod
@@ -60,7 +71,7 @@ class SQLAlchemyUnitOfWork(AbstractUnitOfWork[SQLAlchemyRepository]):
         super().__exit__(exc_type, exc, traceback)
         self.session.close()
 
-    def commit(self) -> None:
+    def _commit(self) -> None:
         self.session.commit()
 
     def rollback(self) -> None:
