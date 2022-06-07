@@ -11,9 +11,7 @@ def subscribe(uow: AbstractUnitOfWork[R], channel_name: str, subscriber: str, ke
         subscription = model.Subscription(
             model.ChannelName(channel_name), model.User(subscriber), model.Keyword(keyword)
         )
-        if subscription in channel.subscriptions:
-            raise ValueError("Already subscribed")
-        channel.subscriptions.add(subscription)
+        channel.subscribe(subscription)
         uow.commit()
 
 
