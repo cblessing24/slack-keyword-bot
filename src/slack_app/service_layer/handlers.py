@@ -1,4 +1,6 @@
-from ..domain import commands, model
+from typing import Any, Generic, Protocol, Type, TypeVar, cast
+
+from ..domain import commands, events, model
 from .unit_of_work import AbstractUnitOfWork, R
 
 
@@ -49,3 +51,43 @@ def unsubscribe(command: commands.Unsubscribe, uow: AbstractUnitOfWork[R]) -> No
             raise ValueError("Unknown subscription")
         channel.subscriptions.remove(subscription)
         uow.commit()
+
+
+C = TypeVar("C", bound=commands.Command, contravariant=True)
+
+
+class CommandHandler(Protocol, Generic[C]):
+    def __call__(self, command: C, uow: AbstractUnitOfWork[R]) -> Any:
+        ...
+
+
+class CommandHandlerMap(Protocol):
+    def __getitem__(self, command: Type[C]) -> CommandHandler[C]:
+        """Returns the appropriate command handler for the given command."""
+
+
+COMMAND_HANDLERS = cast(
+    CommandHandlerMap,
+    {
+        commands.Subscribe: subscribe,
+        commands.ListSubscriptions: list_subscriptions,
+        commands.ListSubscribers: list_subscribers,
+        commands.Unsubscribe: unsubscribe,
+    },
+)
+
+
+E = TypeVar("E", bound=events.Event, contravariant=True)
+
+
+class EventHandler(Protocol, Generic[E]):
+    def __call__(self, event: E, uow: AbstractUnitOfWork[R]) -> None:
+        ...
+
+
+class EventHandlerMap(Protocol):
+    def __getitem__(self, event: Type[E]) -> list[EventHandler[E]]:
+        """Returns the appropriate list of event handlers for the given event."""
+
+
+EVENT_HANDLERS = cast(EventHandlerMap, {events.AlreadySubscribed: []})
