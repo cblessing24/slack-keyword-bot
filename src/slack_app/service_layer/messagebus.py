@@ -1,21 +1,26 @@
+from __future__ import annotations
+
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from ..domain import commands, events
+from .unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
     from .handlers import CommandHandlerMap, EventHandlerMap
-    from .unit_of_work import AbstractUnitOfWork, R
 
 logger = logging.getLogger(__name__)
 
 Message = events.Event | commands.Command
 
 
-class MessageBus:
+U = TypeVar("U", bound=AbstractUnitOfWork[Any])
+
+
+class MessageBus(Generic[U]):
     def __init__(
         self,
-        uow: AbstractUnitOfWork[R],
+        uow: U,
         event_handlers: EventHandlerMap,
         command_handlers: CommandHandlerMap,
     ) -> None:
