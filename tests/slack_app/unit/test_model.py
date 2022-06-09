@@ -5,7 +5,7 @@ from typing import Protocol
 
 import pytest
 
-from slack_app.domain.events import AlreadySubscribed
+from slack_app.domain import events
 from slack_app.domain.model import Channel, ChannelName, Keyword, Message, Text, User
 
 from ..conftest import SubscriptionCreator
@@ -64,7 +64,14 @@ def test_subscribe_records_event_if_subscription_already_exists(
     subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
     channel.subscribe(subscription)
     channel.subscribe(subscription)
-    assert channel.events == [AlreadySubscribed(**dataclasses.asdict(subscription))]
+    assert channel.events == [events.AlreadySubscribed(**dataclasses.asdict(subscription))]
+
+
+def test_subscribe_records_event_if_successful(create_subscription: SubscriptionCreator) -> None:
+    channel = Channel(ChannelName("mychannel"))
+    subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
+    channel.subscribe(subscription)
+    assert channel.events == [events.Subscribed(**dataclasses.asdict(subscription))]
 
 
 def test_channel_repr(create_subscription: SubscriptionCreator) -> None:

@@ -11,6 +11,13 @@ class Event:
 
 
 @dataclass(frozen=True)
+class Subscribed(Event):
+    channel_name: model.ChannelName
+    subscriber: model.User
+    keyword: model.Keyword
+
+
+@dataclass(frozen=True)
 class AlreadySubscribed(Event):
     channel_name: model.ChannelName
     subscriber: model.User

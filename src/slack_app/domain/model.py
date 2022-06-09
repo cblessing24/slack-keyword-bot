@@ -23,6 +23,7 @@ class Channel:
             self.events.append(events.AlreadySubscribed(**dataclasses.asdict(subscription)))
             return
         self.subscriptions.add(subscription)
+        self.events.append(events.Subscribed(**dataclasses.asdict(subscription)))
 
     def find_subscribed(self, message: Message) -> Iterator[User]:
         for subscription in self.subscriptions:
