@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import Protocol
 
 import pytest
@@ -63,7 +64,7 @@ def test_subscribe_records_event_if_subscription_already_exists(
     subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
     channel.subscribe(subscription)
     channel.subscribe(subscription)
-    assert channel.events == [AlreadySubscribed(subscription)]
+    assert channel.events == [AlreadySubscribed(**dataclasses.asdict(subscription))]
 
 
 def test_channel_repr(create_subscription: SubscriptionCreator) -> None:

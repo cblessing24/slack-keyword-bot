@@ -12,4 +12,6 @@ class Event:
 
 @dataclass(frozen=True)
 class AlreadySubscribed(Event):
-    subscription: model.Subscription
+    channel_name: model.ChannelName
+    subscriber: model.User
+    keyword: model.Keyword

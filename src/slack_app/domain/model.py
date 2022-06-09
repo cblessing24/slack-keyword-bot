@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import dataclasses
 import re
-from dataclasses import dataclass
 from typing import Iterable, Iterator, NewType, Optional
 
 from . import events
@@ -20,7 +20,7 @@ class Channel:
 
     def subscribe(self, subscription: Subscription) -> None:
         if subscription in self.subscriptions:
-            self.events.append(events.AlreadySubscribed(subscription))
+            self.events.append(events.AlreadySubscribed(**dataclasses.asdict(subscription)))
             return
         self.subscriptions.add(subscription)
 
@@ -35,14 +35,14 @@ class Channel:
         return f"{self.__class__.__name__}(channel_name='{self.channel_name}', subscriptions={self.subscriptions})"
 
 
-@dataclass(unsafe_hash=True)
+@dataclasses.dataclass(unsafe_hash=True)
 class Subscription:
     channel_name: ChannelName
     subscriber: User
     keyword: Keyword
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class Message:
     channel_name: ChannelName
     author: User
