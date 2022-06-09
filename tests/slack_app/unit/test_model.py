@@ -74,6 +74,29 @@ def test_subscribe_records_event_if_successful(create_subscription: Subscription
     assert channel.events == [events.Subscribed(**dataclasses.asdict(subscription))]
 
 
+def test_unsubscribe_removes_subscription_from_channel(create_subscription: SubscriptionCreator) -> None:
+    channel = Channel(ChannelName("mychannel"))
+    subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
+    channel.subscribe(subscription)
+    channel.unsubscribe(subscription)
+    assert channel.subscriptions == set()
+
+
+def test_unsubscribe_records_event_if_subscription_is_unknown(create_subscription: SubscriptionCreator) -> None:
+    channel = Channel(ChannelName("mychannel"))
+    subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
+    channel.unsubscribe(subscription)
+    assert channel.events == [events.UnknownSubscription(**dataclasses.asdict(subscription))]
+
+
+def test_unsubscribe_records_event_if_successful(create_subscription: SubscriptionCreator) -> None:
+    channel = Channel(ChannelName("mychannel"))
+    subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
+    channel.subscribe(subscription)
+    channel.unsubscribe(subscription)
+    assert events.Unsubscribed(**dataclasses.asdict(subscription)) in channel.events
+
+
 def test_channel_repr(create_subscription: SubscriptionCreator) -> None:
     subscriptions = {create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")}
     channel = Channel(ChannelName("mychannel"), subscriptions=subscriptions)

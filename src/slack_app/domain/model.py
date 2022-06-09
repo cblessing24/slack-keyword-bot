@@ -25,6 +25,13 @@ class Channel:
         self.subscriptions.add(subscription)
         self.events.append(events.Subscribed(**dataclasses.asdict(subscription)))
 
+    def unsubscribe(self, subscription: Subscription) -> None:
+        if subscription not in self.subscriptions:
+            self.events.append(events.UnknownSubscription(**dataclasses.asdict(subscription)))
+            return
+        self.subscriptions.remove(subscription)
+        self.events.append(events.Unsubscribed(**dataclasses.asdict(subscription)))
+
     def find_subscribed(self, message: Message) -> Iterator[User]:
         for subscription in self.subscriptions:
             if subscription.subscriber == message.author:

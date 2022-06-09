@@ -22,3 +22,17 @@ class AlreadySubscribed(Event):
     channel_name: model.ChannelName
     subscriber: model.User
     keyword: model.Keyword
+
+
+@dataclass(frozen=True)
+class UnknownSubscription(Event):
+    channel_name: model.ChannelName
+    subscriber: model.User
+    keyword: model.Keyword
+
+
+@dataclass(frozen=True)
+class Unsubscribed(Event):
+    channel_name: model.ChannelName
+    subscriber: model.User
+    keyword: model.Keyword
