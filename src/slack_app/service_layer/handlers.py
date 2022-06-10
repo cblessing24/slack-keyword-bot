@@ -1,6 +1,9 @@
+from collections.abc import ItemsView
 from typing import Any, Generic, Protocol, Type, TypeVar, cast
 
 from ..domain import commands, events, model
+from ..domain.commands import Command
+from ..domain.events import Event
 from .unit_of_work import AbstractUnitOfWork, R
 
 
@@ -63,7 +66,10 @@ class CommandHandler(Protocol, Generic[C]):
 
 class CommandHandlerMap(Protocol):
     def __getitem__(self, command: Type[C]) -> CommandHandler[C]:
-        """Returns the appropriate command handler for the given command."""
+        """Return the appropriate command handler for the given command."""
+
+    def items(self) -> ItemsView[Type[Command], CommandHandler[Command]]:
+        """Return a view of the command handlers, keyed by command type."""
 
 
 COMMAND_HANDLERS = cast(
@@ -87,7 +93,10 @@ class EventHandler(Protocol, Generic[E]):
 
 class EventHandlerMap(Protocol):
     def __getitem__(self, event: Type[E]) -> list[EventHandler[E]]:
-        """Returns the appropriate list of event handlers for the given event."""
+        """Return the appropriate list of event handlers for the given event."""
+
+    def items(self) -> ItemsView[Type[Event], list[EventHandler[Event]]]:
+        """Return a view of the event handlers, keyed by event type."""
 
 
 EVENT_HANDLERS = cast(EventHandlerMap, {events.AlreadySubscribed: []})
