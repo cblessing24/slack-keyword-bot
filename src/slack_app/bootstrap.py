@@ -1,6 +1,7 @@
 from typing import Optional, overload
 
 from .adapters import orm
+from .adapters.notifications import AbstractNotifications
 from .service_layer.handlers import COMMAND_HANDLERS, EVENT_HANDLERS
 from .service_layer.messagebus import MessageBus, U
 from .service_layer.unit_of_work import SQLAlchemyUnitOfWork
@@ -12,12 +13,12 @@ def bootstrap(*, start_mappers: bool = ...) -> MessageBus[SQLAlchemyUnitOfWork]:
 
 
 @overload
-def bootstrap(*, start_mappers: bool = ..., uow: U = ...) -> MessageBus[U]:
+def bootstrap(*, start_mappers: bool = ..., uow: U = ..., notifications: AbstractNotifications = ...) -> MessageBus[U]:
     ...
 
 
 def bootstrap(
-    *, start_mappers: bool = True, uow: Optional[U] = None
+    *, start_mappers: bool = True, uow: Optional[U] = None, notifications: Optional[AbstractNotifications] = None
 ) -> MessageBus[U] | MessageBus[SQLAlchemyUnitOfWork]:
     if start_mappers:
         orm.start_mappers()
