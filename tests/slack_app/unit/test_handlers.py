@@ -24,7 +24,7 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
 
 @pytest.fixture
 def messagebus() -> MessageBus[FakeUnitOfWork]:
-    messagebus = bootstrap(start_mappers=False, uow=FakeUnitOfWork())
+    messagebus = bootstrap(FakeUnitOfWork(), start_mappers=False)
     return messagebus
 
 

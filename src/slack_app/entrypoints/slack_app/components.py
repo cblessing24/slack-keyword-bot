@@ -8,6 +8,7 @@ from slack_bolt import App
 
 from ...bootstrap import bootstrap
 from ...domain import commands
+from ...service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
 if TYPE_CHECKING:
     from slack_bolt.context.ack import Ack
@@ -51,7 +52,7 @@ class BotMessage(TypedDict):
     text: str
 
 
-bus = bootstrap()
+bus = bootstrap(SQLAlchemyUnitOfWork())
 components: list[Component] = []
 
 
