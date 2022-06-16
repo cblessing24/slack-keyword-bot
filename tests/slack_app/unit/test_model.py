@@ -64,7 +64,7 @@ def test_subscribe_records_event_if_subscription_already_exists(
     subscription = create_subscription(channel_name="mychannel", subscriber="anna", keyword="hello")
     channel.subscribe(subscription)
     channel.subscribe(subscription)
-    assert channel.events == [events.AlreadySubscribed(**dataclasses.asdict(subscription))]
+    assert events.AlreadySubscribed(**dataclasses.asdict(subscription)) in channel.events
 
 
 def test_subscribe_records_event_if_successful(create_subscription: SubscriptionCreator) -> None:
