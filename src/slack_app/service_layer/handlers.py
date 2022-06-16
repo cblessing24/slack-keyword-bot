@@ -99,4 +99,4 @@ class EventHandlerMap(Protocol):
         """Return a view of the event handlers, keyed by event type."""
 
 
-EVENT_HANDLERS = cast(EventHandlerMap, {events.AlreadySubscribed: []})
+EVENT_HANDLERS = cast(EventHandlerMap, {events.Subscribed: [], events.AlreadySubscribed: []})
