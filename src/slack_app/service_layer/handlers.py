@@ -1,5 +1,5 @@
 from collections.abc import ItemsView
-from typing import Any, Generic, Protocol, Type, TypeVar, cast
+from typing import Any, Protocol, Type, TypeVar, Union, cast
 
 from ..domain import commands, events, model
 from ..domain.commands import Command
@@ -56,19 +56,25 @@ def unsubscribe(command: commands.Unsubscribe, uow: AbstractUnitOfWork[R]) -> No
         uow.commit()
 
 
-C = TypeVar("C", bound=commands.Command, contravariant=True)
+Message = Union[commands.Command, events.Event]
 
 
-class CommandHandler(Protocol, Generic[C]):
-    def __call__(self, command: C, uow: AbstractUnitOfWork[R]) -> Any:
+M = TypeVar("M", bound=Message, contravariant=True)
+
+
+class MessageHandler(Protocol[M]):
+    def __call__(self, message: M, uow: AbstractUnitOfWork[R]) -> Any:
         ...
 
 
+C = TypeVar("C", bound=commands.Command, contravariant=True)
+
+
 class CommandHandlerMap(Protocol):
-    def __getitem__(self, command: Type[C]) -> CommandHandler[C]:
+    def __getitem__(self, command: Type[C]) -> MessageHandler[C]:
         """Return the appropriate command handler for the given command."""
 
-    def items(self) -> ItemsView[Type[Command], CommandHandler[Command]]:
+    def items(self) -> ItemsView[Type[Command], MessageHandler[Command]]:
         """Return a view of the command handlers, keyed by command type."""
 
 
@@ -86,16 +92,11 @@ COMMAND_HANDLERS = cast(
 E = TypeVar("E", bound=events.Event, contravariant=True)
 
 
-class EventHandler(Protocol, Generic[E]):
-    def __call__(self, event: E, uow: AbstractUnitOfWork[R]) -> None:
-        ...
-
-
 class EventHandlerMap(Protocol):
-    def __getitem__(self, event: Type[E]) -> list[EventHandler[E]]:
+    def __getitem__(self, event: Type[E]) -> list[MessageHandler[E]]:
         """Return the appropriate list of event handlers for the given event."""
 
-    def items(self) -> ItemsView[Type[Event], list[EventHandler[Event]]]:
+    def items(self) -> ItemsView[Type[Event], list[MessageHandler[Event]]]:
         """Return a view of the event handlers, keyed by event type."""
 
 
