@@ -46,7 +46,7 @@ class MessageBus(Generic[U]):
         for handler in self.event_handlers[type(event)]:
             logger.debug(f"Handling event {event!r} with handler {handler!r}")
             try:
-                handler(event, uow=self.uow)
+                handler(event)
                 queue.extend(self.uow.collect_new_events())
             except Exception:
                 logger.exception(f"Exception handling event {event!r}")
@@ -56,7 +56,7 @@ class MessageBus(Generic[U]):
         logger.debug(f"Handling command {command!r}")
         try:
             handler = self.command_handlers[type(command)]
-            result = handler(command, uow=self.uow)
+            result = handler(command)
             queue.extend(self.uow.collect_new_events())
             return result
         except Exception:
