@@ -1,6 +1,7 @@
 from collections.abc import ItemsView
 from typing import Any, Protocol, Type, TypeVar, Union, cast
 
+from ..adapters.notifications import AbstractNotifications
 from ..domain import commands, events, model
 from ..domain.commands import Command
 from ..domain.events import Event
@@ -59,6 +60,12 @@ def unsubscribe(command: commands.Unsubscribe, uow: AbstractUnitOfWork[R]) -> No
 Message = Union[commands.Command, events.Event]
 
 
+def send_subscribed_notification(event: events.Subscribed, notifications: AbstractNotifications) -> None:
+    notifications.send(
+        event.subscriber, f"You will be notified if {event.keyword!r} is mentioned in {event.channel_name!r}"
+    )
+
+
 M = TypeVar("M", bound=Message, contravariant=True)
 
 
@@ -100,4 +107,6 @@ class EventHandlerMap(Protocol):
         """Return a view of the event handlers, keyed by event type."""
 
 
-EVENT_HANDLERS = cast(EventHandlerMap, {events.Subscribed: [], events.AlreadySubscribed: []})
+EVENT_HANDLERS = cast(
+    EventHandlerMap, {events.Subscribed: [send_subscribed_notification], events.AlreadySubscribed: []}
+)

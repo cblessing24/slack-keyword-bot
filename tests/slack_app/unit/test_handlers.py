@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import pytest
 
+from slack_app.adapters.notifications import AbstractNotifications
 from slack_app.bootstrap import bootstrap
 from slack_app.domain import commands
 from slack_app.service_layer.messagebus import MessageBus
@@ -22,9 +25,27 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
         pass
 
 
+class FakeNotifications(AbstractNotifications):
+    @dataclass
+    class Message:
+        destination: str
+        message: str
+
+    def __init__(self) -> None:
+        self.messages: list[FakeNotifications.Message] = []
+
+    def send(self, destination: str, message: str) -> None:
+        self.messages.append(self.Message(destination, message))
+
+
 @pytest.fixture
-def messagebus() -> MessageBus[FakeUnitOfWork]:
-    messagebus = bootstrap(FakeUnitOfWork(), start_mappers=False)
+def notifications() -> FakeNotifications:
+    return FakeNotifications()
+
+
+@pytest.fixture
+def messagebus(notifications: FakeNotifications) -> MessageBus[FakeUnitOfWork]:
+    messagebus = bootstrap(FakeUnitOfWork(), start_mappers=False, notifications=notifications)
     return messagebus
 
 
@@ -77,3 +98,12 @@ def test_unsubscribe_errors_for_unknown_subscription(messagebus: MessageBus[Fake
     messagebus.handle(commands.Subscribe(channel_name="general", subscriber="john", keyword="hello"))
     with pytest.raises(ValueError, match="Unknown subscription"):
         messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
+
+
+def test_subscribed_notification_is_sent(
+    messagebus: MessageBus[FakeUnitOfWork], notifications: FakeNotifications
+) -> None:
+    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    assert notifications.messages == [
+        FakeNotifications.Message("bob", "You will be notified if 'hello' is mentioned in 'general'")
+    ]
