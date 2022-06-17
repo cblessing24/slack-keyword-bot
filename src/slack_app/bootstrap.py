@@ -1,9 +1,9 @@
 import functools
 import inspect
-from typing import Any, Mapping, Optional, cast
+from typing import Mapping, Optional, cast
 
 from .adapters import orm
-from .adapters.notifications import AbstractNotifications
+from .adapters.notifications import AbstractNotifications, SlackNotifications
 from .service_layer.handlers import (
     COMMAND_HANDLERS,
     EVENT_HANDLERS,
@@ -21,7 +21,10 @@ def bootstrap(
     if start_mappers:
         orm.start_mappers()
 
-    dependencies = {"uow": uow}
+    if notifications is None:
+        notifications = SlackNotifications()
+
+    dependencies = {"uow": uow, "notifications": notifications}
     injected_command_handlers = cast(
         CommandHandlerMap,
         {
@@ -42,7 +45,7 @@ def bootstrap(
     )
 
 
-def inject_dependencies(handler: MessageHandler[M], dependencies: Mapping[str, Any]) -> MessageHandler[M]:
+def inject_dependencies(handler: MessageHandler[M], dependencies: Mapping[str, object]) -> MessageHandler[M]:
     params = inspect.signature(handler).parameters
     deps = {name: dependency for name, dependency in dependencies.items() if name in params}
     return functools.partial(handler, **deps)
