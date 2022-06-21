@@ -7,7 +7,7 @@ from . import model
 
 @dataclass(frozen=True)
 class Event:
-    pass
+    """Base class for all events."""
 
 
 @dataclass(frozen=True)
