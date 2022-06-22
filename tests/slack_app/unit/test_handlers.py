@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 import pytest
 
@@ -28,14 +29,18 @@ class FakeUnitOfWork(AbstractUnitOfWork[FakeRepository]):
 class FakeNotifications(AbstractNotifications):
     @dataclass
     class Message:
-        destination: str
+        channel: str
         message: str
+        recipient: Optional[str] = None
 
     def __init__(self) -> None:
         self.messages: list[FakeNotifications.Message] = []
 
-    def send(self, destination: str, message: str) -> None:
-        self.messages.append(self.Message(destination, message))
+    def send(self, channel: str, message: str) -> None:
+        self.messages.append(self.Message(channel, message))
+
+    def respond(self, channel: str, message: str, recipient: str) -> None:
+        self.messages.append(self.Message(channel, message, recipient))
 
 
 @pytest.fixture
@@ -105,5 +110,7 @@ def test_subscribed_notification_is_sent(
 ) -> None:
     messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
     assert notifications.messages == [
-        FakeNotifications.Message("bob", "You will be notified if 'hello' is mentioned in 'general'")
+        FakeNotifications.Message(
+            channel="general", message="You will be notified if 'hello' is mentioned in general", recipient="bob"
+        )
     ]
