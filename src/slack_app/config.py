@@ -8,3 +8,7 @@ def get_postgres_uri() -> str:
     password = os.environ.get("DB_PASSWORD", "abc123")
     db_name = os.environ.get("DB_NAME", "slack-app")
     return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+
+
+def get_slack_bot_token() -> str:
+    return os.environ.get("SLACK_BOT_TOKEN", "")
