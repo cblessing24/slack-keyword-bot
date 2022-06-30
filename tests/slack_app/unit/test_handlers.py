@@ -109,3 +109,11 @@ def test_subscribed_notification_is_sent(
 ) -> None:
     messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
     assert notifications.responses == ["You will be notified if 'hello' is mentioned in <#general>"]
+
+
+def test_unsubscribed_notifications_is_sent(
+    messagebus: MessageBus[FakeUnitOfWork], notifications: FakeNotifications
+) -> None:
+    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    assert "You will be no longer notified if 'hello' is mentioned in <#general>" in notifications.responses

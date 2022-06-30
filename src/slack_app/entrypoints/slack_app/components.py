@@ -135,6 +135,7 @@ components.append(Listener("command", command_keyword_list, args=["/keyword-list
 def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
+    SlackNotifications.slack_respond = respond
     try:
         bus.handle(
             commands.Unsubscribe(channel_name=command["channel_id"], subscriber=command["user_id"], keyword=keyword),
@@ -142,7 +143,6 @@ def command_keyword_unsubscribe(ack: Ack, command: Command, respond: Respond) ->
     except ValueError:
         respond(f"You are not subscribed to '{keyword}' in <#{command['channel_id']}>!")
         return
-    respond(f"You will no longer be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
 
 components.append(Listener("command", command_keyword_unsubscribe, args=["/keyword-unsubscribe"]))

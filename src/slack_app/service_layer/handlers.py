@@ -45,15 +45,10 @@ def unsubscribe(command: commands.Unsubscribe, uow: AbstractUnitOfWork[R]) -> No
         channel = uow.channels.get(model.ChannelName(command.channel_name))
         if not channel:
             raise ValueError("Unknown channel")
-        try:
-            subscription = next(
-                s
-                for s in channel.subscriptions
-                if s.subscriber == model.User(command.subscriber) and s.keyword == model.Keyword(command.keyword)
-            )
-        except StopIteration:
-            raise ValueError("Unknown subscription")
-        channel.subscriptions.remove(subscription)
+        subscription = model.Subscription(
+            model.ChannelName(command.channel_name), model.User(command.subscriber), model.Keyword(command.keyword)
+        )
+        channel.unsubscribe(subscription)
         uow.commit()
 
 
@@ -62,6 +57,12 @@ Message = Union[commands.Command, events.Event]
 
 def send_subscribed_notification(event: events.Subscribed, notifications: AbstractNotifications) -> None:
     notifications.respond(f"You will be notified if '{event.keyword}' is mentioned in <#{event.channel_name}>")
+
+
+def send_unsubscribed_notification(event: events.Unsubscribed, notifications: AbstractNotifications) -> None:
+    notifications.respond(
+        f"You will be no longer notified if '{event.keyword}' is mentioned in <#{event.channel_name}>"
+    )
 
 
 M = TypeVar("M", bound=Message, contravariant=True)
@@ -106,5 +107,10 @@ class EventHandlerMap(Protocol):
 
 
 EVENT_HANDLERS = cast(
-    EventHandlerMap, {events.Subscribed: [send_subscribed_notification], events.AlreadySubscribed: []}
+    EventHandlerMap,
+    {
+        events.Subscribed: [send_subscribed_notification],
+        events.Unsubscribed: [send_unsubscribed_notification],
+        events.AlreadySubscribed: [],
+    },
 )
