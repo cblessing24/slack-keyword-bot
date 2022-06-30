@@ -61,11 +61,7 @@ Message = Union[commands.Command, events.Event]
 
 
 def send_subscribed_notification(event: events.Subscribed, notifications: AbstractNotifications) -> None:
-    notifications.respond(
-        channel=event.channel_name,
-        message=f"You will be notified if '{event.keyword}' is mentioned in {event.channel_name}",
-        recipient=event.subscriber,
-    )
+    notifications.respond(f"You will be notified if '{event.keyword}' is mentioned in <#{event.channel_name}>")
 
 
 M = TypeVar("M", bound=Message, contravariant=True)

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, TypedDict
 
 from slack_bolt import App
 
+from ...adapters.notifications import SlackNotifications
 from ...bootstrap import bootstrap
 from ...domain import commands
 from ...service_layer.unit_of_work import SQLAlchemyUnitOfWork
@@ -102,10 +103,10 @@ components.append(Listener("event", event_message, args=["message"]))
 def command_keyword_subscribe(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
     keyword = command.get("text") or ""
+    SlackNotifications.slack_respond = respond
     bus.handle(
         commands.Subscribe(channel_name=command["channel_id"], subscriber=command["user_id"], keyword=keyword),
     )
-    respond(f"You will be notified if '{keyword}' is mentioned in <#{command['channel_id']}>!")
 
 
 components.append(Listener("command", command_keyword_subscribe, args=["/keyword-subscribe"]))

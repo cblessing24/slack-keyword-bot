@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Callable
 
 import pytest
 
@@ -11,16 +11,12 @@ class FakeSlackClient:
     class Message:
         channel: str
         text: str
-        user: Optional[str] = None
 
     def __init__(self) -> None:
         self.messages: list[FakeSlackClient.Message] = []
 
     def chat_postMessage(self, channel: str, text: str) -> None:
         self.messages.append(FakeSlackClient.Message(channel, text))
-
-    def chat_postEphemeral(self, channel: str, text: str, user: str) -> None:
-        self.messages.append(FakeSlackClient.Message(channel, text, user))
 
 
 @pytest.fixture
@@ -42,7 +38,16 @@ def test_can_send_message(slack_client: FakeSlackClient, client_factory: Callabl
     assert slack_client.messages == [FakeSlackClient.Message("#general", "Hello, world!")]
 
 
-def test_can_respond(slack_client: FakeSlackClient, client_factory: Callable[[], SlackClient]) -> None:
+def test_can_respond(client_factory: Callable[[], SlackClient]) -> None:
+    class FakeSlackRespond:
+        def __init__(self) -> None:
+            self.messages: list[str] = []
+
+        def __call__(self, message: str) -> None:
+            self.messages.append(message)
+
     notifications = SlackNotifications(client_factory)
-    notifications.respond(channel="#general", message="Hello, world!", recipient="U12345")
-    assert slack_client.messages == [FakeSlackClient.Message("#general", "Hello, world!", user="U12345")]
+    slack_respond = FakeSlackRespond()
+    notifications.slack_respond = slack_respond
+    notifications.respond(message="Hello, world!")
+    assert slack_respond.messages == ["Hello, world!"]
