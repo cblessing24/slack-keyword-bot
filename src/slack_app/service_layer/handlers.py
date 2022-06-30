@@ -59,6 +59,10 @@ def send_subscribed_notification(event: events.Subscribed, notifications: Abstra
     notifications.respond(f"You will be notified if '{event.keyword}' is mentioned in <#{event.channel_name}>")
 
 
+def send_already_subscribed_notification(event: events.AlreadySubscribed, notifications: AbstractNotifications) -> None:
+    notifications.respond(f"You are already subscribed to '{event.keyword}' in <#{event.channel_name}>")
+
+
 def send_unsubscribed_notification(event: events.Unsubscribed, notifications: AbstractNotifications) -> None:
     notifications.respond(
         f"You will be no longer notified if '{event.keyword}' is mentioned in <#{event.channel_name}>"
@@ -118,6 +122,6 @@ EVENT_HANDLERS = cast(
         events.Subscribed: [send_subscribed_notification],
         events.Unsubscribed: [send_unsubscribed_notification],
         events.UnknownSubscription: [send_unknown_subscription_notification],
-        events.AlreadySubscribed: [],
+        events.AlreadySubscribed: [send_already_subscribed_notification],
     },
 )
