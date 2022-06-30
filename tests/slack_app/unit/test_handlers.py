@@ -98,12 +98,6 @@ def test_unsubscribe_errors_for_unknown_channel(messagebus: MessageBus[FakeUnitO
         messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
 
 
-def test_unsubscribe_errors_for_unknown_subscription(messagebus: MessageBus[FakeUnitOfWork]) -> None:
-    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="john", keyword="hello"))
-    with pytest.raises(ValueError, match="Unknown subscription"):
-        messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
-
-
 def test_subscribed_notification_is_sent(
     messagebus: MessageBus[FakeUnitOfWork], notifications: FakeNotifications
 ) -> None:
@@ -117,3 +111,12 @@ def test_unsubscribed_notifications_is_sent(
     messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
     messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
     assert "You will be no longer notified if 'hello' is mentioned in <#general>" in notifications.responses
+
+
+def test_unknown_subscription_notification_is_sent(
+    messagebus: MessageBus[FakeUnitOfWork], notifications: FakeNotifications
+) -> None:
+    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    assert "You are not subscribed to 'hello' in <#general>" in notifications.responses

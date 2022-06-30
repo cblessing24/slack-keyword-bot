@@ -65,6 +65,12 @@ def send_unsubscribed_notification(event: events.Unsubscribed, notifications: Ab
     )
 
 
+def send_unknown_subscription_notification(
+    event: events.UnknownSubscription, notifications: AbstractNotifications
+) -> None:
+    notifications.respond(f"You are not subscribed to '{event.keyword}' in <#{event.channel_name}>")
+
+
 M = TypeVar("M", bound=Message, contravariant=True)
 
 
@@ -111,6 +117,7 @@ EVENT_HANDLERS = cast(
     {
         events.Subscribed: [send_subscribed_notification],
         events.Unsubscribed: [send_unsubscribed_notification],
+        events.UnknownSubscription: [send_unknown_subscription_notification],
         events.AlreadySubscribed: [],
     },
 )
