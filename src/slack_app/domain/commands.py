@@ -25,9 +25,3 @@ class FindMentions(Command):
     channel_name: str
     author: str
     text: str
-
-
-@dataclass(frozen=True)
-class ListSubscriptions(Command):
-    channel_name: str
-    subscriber: str

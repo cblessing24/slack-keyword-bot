@@ -32,14 +32,6 @@ def find_mentions(command: commands.FindMentions, uow: AbstractUnitOfWork[R]) ->
         channel.find_subscribed(message)
 
 
-def list_subscriptions(command: commands.ListSubscriptions, uow: AbstractUnitOfWork[R]) -> set[str]:
-    with uow:
-        channel = uow.channels.get(model.ChannelName(command.channel_name))
-        if not channel:
-            raise ValueError("Unknown channel")
-        return {s.keyword for s in channel.subscriptions if s.subscriber == model.User(command.subscriber)}
-
-
 def unsubscribe(command: commands.Unsubscribe, uow: AbstractUnitOfWork[R]) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(command.channel_name))
@@ -128,7 +120,6 @@ COMMAND_HANDLERS = cast(
     CommandHandlerMap,
     {
         commands.Subscribe: subscribe,
-        commands.ListSubscriptions: list_subscriptions,
         commands.FindMentions: find_mentions,
         commands.Unsubscribe: unsubscribe,
     },

@@ -53,32 +53,14 @@ def messagebus(notifications: FakeNotifications) -> MessageBus[FakeUnitOfWork]:
     return messagebus
 
 
-def test_subscription_gets_added(messagebus: MessageBus[FakeUnitOfWork]) -> None:
-    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
-    subscriptions = messagebus.handle(commands.ListSubscriptions(channel_name="general", subscriber="bob"))
-    assert subscriptions == [{"hello"}]
-
-
 def test_added_subscription_gets_committed(messagebus: MessageBus[FakeUnitOfWork]) -> None:
     messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
     assert messagebus.uow.committed
 
 
-def test_list_keywords_errors_for_unknown_channe(messagebus: MessageBus[FakeUnitOfWork]) -> None:
-    with pytest.raises(ValueError, match="Unknown channel"):
-        messagebus.handle(commands.ListSubscriptions(channel_name="general", subscriber="bob"))
-
-
 def test_find_mentions_errors_for_unknown_channel(messagebus: MessageBus[FakeUnitOfWork]) -> None:
     with pytest.raises(ValueError, match="Unknown channel"):
         messagebus.handle(commands.FindMentions(channel_name="general", author="john", text="Goodbye World"))
-
-
-def test_can_unsubscribe(messagebus: MessageBus[FakeUnitOfWork]) -> None:
-    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
-    messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
-    subscriptions = messagebus.handle(commands.ListSubscriptions(channel_name="general", subscriber="bob"))
-    assert subscriptions == [set()]
 
 
 def test_unsubscribe_errors_for_unknown_channel(messagebus: MessageBus[FakeUnitOfWork]) -> None:
