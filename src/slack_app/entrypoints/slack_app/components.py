@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, TypedDict
 
 from slack_bolt import App
 
+from slack_app import views
+
 from ...adapters.notifications import SlackNotifications, SlackRespond
 from ...bootstrap import bootstrap
 from ...domain import commands
@@ -106,19 +108,12 @@ components.append(Listener("command", command_keyword_subscribe, args=["/keyword
 
 def command_keyword_list(ack: Ack, command: Command, respond: Respond) -> None:
     ack()
-    no_subscriptions_msg = f"You are not subscribed to any keywords in <#{command['channel_id']}>."
-    try:
-        subscriptions = bus.handle(
-            commands.ListSubscriptions(channel_name=command["channel_id"], subscriber=command["user_id"]),
-        )[0]
-    except ValueError:
-        respond(no_subscriptions_msg)
+    keywords = views.keywords(command["channel_id"], command["user_id"], bus.uow)
+    if not keywords:
+        respond(f"You are not subscribed to any keywords in <#{command['channel_id']}>.")
         return
-    if not subscriptions:
-        respond(no_subscriptions_msg)
-        return
-    kewywords_text = "\n".join(f"    - '{k}'" for k in subscriptions)
-    respond(f"Your subscriptions in this channel:\n{kewywords_text}")
+    kewywords_text = "\n".join(f"    - '{k}'" for k in keywords)
+    respond(f"You are subscribed to the following keywords in <#{command['channel_id']}>:\n{kewywords_text}")
 
 
 components.append(Listener("command", command_keyword_list, args=["/keyword-list"]))

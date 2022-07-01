@@ -1,5 +1,5 @@
 from collections.abc import ItemsView
-from typing import Any, Protocol, Type, TypeVar, Union, cast
+from typing import Protocol, Type, TypeVar, Union, cast
 
 from ..adapters.notifications import AbstractNotifications
 from ..domain import commands, events, model
