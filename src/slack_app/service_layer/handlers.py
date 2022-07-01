@@ -5,7 +5,7 @@ from ..adapters.notifications import AbstractNotifications
 from ..domain import commands, events, model
 from ..domain.commands import Command
 from ..domain.events import Event
-from .unit_of_work import AbstractUnitOfWork, R
+from .unit_of_work import AbstractUnitOfWork, R, SQLAlchemyUnitOfWork
 
 
 def subscribe(command: commands.Subscribe, uow: AbstractUnitOfWork[R]) -> None:
@@ -81,6 +81,30 @@ def send_mentioned_notification(event: events.Mentioned, notifications: Abstract
     notifications.send(event.subscriber, message)
 
 
+def add_subscription_to_read_model(event: events.Subscribed, uow: SQLAlchemyUnitOfWork) -> None:
+    with uow:
+        uow.session.execute(
+            """
+            INSERT INTO subscription_view (channel_name, subscriber, keyword)
+            VALUES (:channel_name, :subscriber, :keyword)
+            """,
+            {"channel_name": event.channel_name, "subscriber": event.subscriber, "keyword": event.keyword},
+        )
+        uow.commit()
+
+
+def remove_subscription_from_read_model(event: events.Unsubscribed, uow: SQLAlchemyUnitOfWork) -> None:
+    with uow:
+        uow.session.execute(
+            """
+            DELETE FROM subscription_view
+            WHERE channel_name = :channel_name AND subscriber = :subscriber AND keyword = :keyword
+            """,
+            {"channel_name": event.channel_name, "subscriber": event.subscriber, "keyword": event.keyword},
+        )
+        uow.commit()
+
+
 M = TypeVar("M", bound=Message, contravariant=True)
 
 
@@ -125,8 +149,8 @@ class EventHandlerMap(Protocol):
 EVENT_HANDLERS = cast(
     EventHandlerMap,
     {
-        events.Subscribed: [send_subscribed_notification],
-        events.Unsubscribed: [send_unsubscribed_notification],
+        events.Subscribed: [send_subscribed_notification, add_subscription_to_read_model],
+        events.Unsubscribed: [send_unsubscribed_notification, remove_subscription_from_read_model],
         events.UnknownSubscription: [send_unknown_subscription_notification],
         events.AlreadySubscribed: [send_already_subscribed_notification],
         events.Mentioned: [send_mentioned_notification],

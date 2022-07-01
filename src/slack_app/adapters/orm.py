@@ -19,6 +19,14 @@ subscription = Table(
     Column("keyword", String(255)),
 )
 
+subscription_view = Table(
+    "subscription_view",
+    metadata,
+    Column("channel_name", String(255)),
+    Column("subscriber", String(255)),
+    Column("keyword", String(255)),
+)
+
 
 def start_mappers() -> None:
     mapper_registry.map_imperatively(Subscription, subscription)
