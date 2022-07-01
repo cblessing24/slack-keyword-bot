@@ -28,19 +28,16 @@ class MessageBus(Generic[U]):
         self.event_handlers = event_handlers
         self.command_handlers = command_handlers
 
-    def handle(self, message: Message) -> list[Any]:
-        results: list[Any] = []
+    def handle(self, message: Message) -> None:
         queue = [message]
         while queue:
             message = queue.pop(0)
             if isinstance(message, events.Event):
                 self.handle_event(message, queue)
             elif isinstance(message, commands.Command):
-                cmd_result = self.handle_command(message, queue)
-                results.append(cmd_result)
+                self.handle_command(message, queue)
             else:
                 raise TypeError(f"Unknown message type: {type(message)}")
-        return results
 
     def handle_event(self, event: events.Event, queue: list[Message]) -> None:
         for handler in self.event_handlers[type(event)]:
@@ -52,13 +49,12 @@ class MessageBus(Generic[U]):
                 logger.exception(f"Exception handling event {event!r}")
                 continue
 
-    def handle_command(self, command: commands.Command, queue: list[Message]) -> Any:
+    def handle_command(self, command: commands.Command, queue: list[Message]) -> None:
         logger.debug(f"Handling command {command!r}")
         try:
             handler = self.command_handlers[type(command)]
-            result = handler(command)
+            handler(command)
             queue.extend(self.uow.collect_new_events())
-            return result
         except Exception:
             logger.exception(f"Exception handling command {command!r}")
             raise

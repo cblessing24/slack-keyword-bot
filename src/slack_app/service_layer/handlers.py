@@ -101,7 +101,7 @@ M = TypeVar("M", bound=Message, contravariant=True)
 
 
 class MessageHandler(Protocol[M]):
-    def __call__(self, message: M) -> Any:
+    def __call__(self, message: M) -> None:
         ...
 
 
