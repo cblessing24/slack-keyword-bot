@@ -5,6 +5,8 @@ import pytest
 from slack_app.domain.model import Channel, ChannelName
 from slack_app.service_layer.unit_of_work import SQLAlchemyUnitOfWork
 
+pytestmark = pytest.mark.usefixtures("mappers")
+
 
 def test_can_add_channel(session_factory: Any) -> None:
     uow = SQLAlchemyUnitOfWork(session_factory)

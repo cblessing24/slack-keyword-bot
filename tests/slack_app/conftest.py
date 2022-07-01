@@ -1,4 +1,4 @@
-from typing import Any, Protocol
+from typing import Any, Generator, Protocol
 
 import pytest
 from sqlalchemy import create_engine
@@ -34,8 +34,13 @@ def in_memory_db() -> Any:
 
 @pytest.fixture
 def session_factory(in_memory_db: Any) -> Any:
-    start_mappers()
     yield sessionmaker(bind=in_memory_db)
+
+
+@pytest.fixture
+def mappers() -> Generator[None, None, None]:
+    start_mappers()
+    yield
     clear_mappers()
 
 
