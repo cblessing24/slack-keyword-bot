@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from typing import Iterable, Iterator, NewType, Optional
+from typing import Iterable, NewType, Optional
 
 from . import events
 
@@ -32,12 +32,20 @@ class Channel:
         self.subscriptions.remove(subscription)
         self.events.append(events.Unsubscribed(**dataclasses.asdict(subscription)))
 
-    def find_subscribed(self, message: Message) -> Iterator[User]:
+    def find_subscribed(self, message: Message) -> None:
         for subscription in self.subscriptions:
             if subscription.subscriber == message.author:
                 continue
             if subscription.keyword in message:
-                yield subscription.subscriber
+                self.events.append(
+                    events.Mentioned(
+                        channel_name=message.channel_name,
+                        subscriber=subscription.subscriber,
+                        keyword=subscription.keyword,
+                        author=message.author,
+                        text=message.text,
+                    )
+                )
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(channel_name='{self.channel_name}', subscriptions={self.subscriptions})"

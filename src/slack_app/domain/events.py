@@ -36,3 +36,12 @@ class Unsubscribed(Event):
     channel_name: model.ChannelName
     subscriber: model.User
     keyword: model.Keyword
+
+
+@dataclass(frozen=True)
+class Mentioned(Event):
+    channel_name: model.ChannelName
+    subscriber: model.User
+    keyword: model.Keyword
+    author: model.User
+    text: model.Text

@@ -21,7 +21,7 @@ def subscribe(command: commands.Subscribe, uow: AbstractUnitOfWork[R]) -> None:
         uow.commit()
 
 
-def list_subscribers(command: commands.ListSubscribers, uow: AbstractUnitOfWork[R]) -> set[str]:
+def find_mentions(command: commands.FindMentions, uow: AbstractUnitOfWork[R]) -> None:
     with uow:
         channel = uow.channels.get(model.ChannelName(command.channel_name))
         if not channel:
@@ -29,7 +29,7 @@ def list_subscribers(command: commands.ListSubscribers, uow: AbstractUnitOfWork[
         message = model.Message(
             model.ChannelName(command.channel_name), model.User(command.author), model.Text(command.text)
         )
-        return set(channel.find_subscribed(message))
+        channel.find_subscribed(message)
 
 
 def list_subscriptions(command: commands.ListSubscriptions, uow: AbstractUnitOfWork[R]) -> set[str]:
@@ -75,6 +75,12 @@ def send_unknown_subscription_notification(
     notifications.respond(f"You are not subscribed to '{event.keyword}' in <#{event.channel_name}>")
 
 
+def send_mentioned_notification(event: events.Mentioned, notifications: AbstractNotifications) -> None:
+    message = f"<@{event.author}> mentioned '{event.keyword}' in <#{event.channel_name}>:\n> "
+    message += "\n> ".join(event.text.split("\n"))
+    notifications.send(event.subscriber, message)
+
+
 M = TypeVar("M", bound=Message, contravariant=True)
 
 
@@ -99,7 +105,7 @@ COMMAND_HANDLERS = cast(
     {
         commands.Subscribe: subscribe,
         commands.ListSubscriptions: list_subscriptions,
-        commands.ListSubscribers: list_subscribers,
+        commands.FindMentions: find_mentions,
         commands.Unsubscribe: unsubscribe,
     },
 )
@@ -123,5 +129,6 @@ EVENT_HANDLERS = cast(
         events.Unsubscribed: [send_unsubscribed_notification],
         events.UnknownSubscription: [send_unknown_subscription_notification],
         events.AlreadySubscribed: [send_already_subscribed_notification],
+        events.Mentioned: [send_mentioned_notification],
     },
 )

@@ -69,21 +69,9 @@ def test_list_keywords_errors_for_unknown_channe(messagebus: MessageBus[FakeUnit
         messagebus.handle(commands.ListSubscriptions(channel_name="general", subscriber="bob"))
 
 
-def test_subscribers_are_returned(messagebus: MessageBus[FakeUnitOfWork]) -> None:
-    in_keyword = ("general", "bob", "World")
-    out_keyword = ("general", "alice", "World")
-    author_keyword = ("general", "john", "Goodbye")
-    for subscription in [in_keyword, out_keyword, author_keyword]:
-        messagebus.handle(commands.Subscribe(*subscription))
-    subscribers = messagebus.handle(
-        commands.ListSubscribers(channel_name="general", author="john", text="Goodbye World")
-    )
-    assert subscribers == [{"bob", "alice"}]
-
-
-def test_get_subscribers_errors_for_unknown_channel(messagebus: MessageBus[FakeUnitOfWork]) -> None:
+def test_find_mentions_errors_for_unknown_channel(messagebus: MessageBus[FakeUnitOfWork]) -> None:
     with pytest.raises(ValueError, match="Unknown channel"):
-        messagebus.handle(commands.ListSubscribers(channel_name="general", author="john", text="Goodbye World"))
+        messagebus.handle(commands.FindMentions(channel_name="general", author="john", text="Goodbye World"))
 
 
 def test_can_unsubscribe(messagebus: MessageBus[FakeUnitOfWork]) -> None:
@@ -128,3 +116,23 @@ def test_unknown_subscription_notification_is_sent(
     messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
     messagebus.handle(commands.Unsubscribe(channel_name="general", subscriber="bob", keyword="hello"))
     assert "You are not subscribed to 'hello' in <#general>" in notifications.responses
+
+
+def test_subscriber_notifications_are_sent(
+    messagebus: MessageBus[FakeUnitOfWork], notifications: FakeNotifications
+) -> None:
+    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="bob", keyword="hello"))
+    messagebus.handle(commands.Subscribe(channel_name="general", subscriber="alice", keyword="hello"))
+    messagebus.handle(
+        commands.FindMentions(channel_name="general", author="dave", text="hello, my name is dave\nCheers!")
+    )
+    expected = [
+        FakeNotifications.Message(
+            "bob", "<@dave> mentioned 'hello' in <#general>:\n> hello, my name is dave\n> Cheers!"
+        ),
+        FakeNotifications.Message(
+            "alice", "<@dave> mentioned 'hello' in <#general>:\n> hello, my name is dave\n> Cheers!"
+        ),
+    ]
+    for message in expected:
+        assert message in notifications.messages

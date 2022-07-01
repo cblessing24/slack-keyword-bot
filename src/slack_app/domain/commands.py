@@ -21,7 +21,7 @@ class Unsubscribe(Command):
 
 
 @dataclass(frozen=True)
-class ListSubscribers(Command):
+class FindMentions(Command):
     channel_name: str
     author: str
     text: str

@@ -36,15 +36,6 @@ def test_message_does_not_contain_partial_keyword(create_msg: MessageCreator) ->
     assert Keyword("Good") not in create_msg(text="Goodbye World!")
 
 
-def test_subscribers_are_returned(create_subscription: SubscriptionCreator, create_msg: MessageCreator) -> None:
-    message = create_msg(channel_name="mychannel", author="john", text="hello world")
-    in_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="hello")
-    out_keyword = create_subscription(channel_name="mychannel", subscriber="bob", keyword="goodbye")
-    author_keyword = create_subscription(channel_name="mychannel", subscriber="john", keyword="hello")
-    channel = Channel(ChannelName("mychannel"), subscriptions={in_keyword, out_keyword, author_keyword})
-    assert list(channel.find_subscribed(message)) == [User("bob")]
-
-
 def test_channel_gets_initialized_with_empty_set_by_default() -> None:
     channel = Channel(ChannelName("mychannel"))
     assert channel.subscriptions == set()

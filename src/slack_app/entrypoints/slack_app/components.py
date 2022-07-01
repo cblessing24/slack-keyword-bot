@@ -72,36 +72,21 @@ def log_request(logger: logging.Logger, body: Mapping[str, Any], next: Callable[
 components.append(Component("middleware", log_request))
 
 
-def event_bot_message(logger: logging.Logger, event: BotMessage, client: WebClient) -> None:
+def event_bot_message(event: BotMessage, client: WebClient) -> None:
     bot_name = client.bots_info(bot=event["bot_id"])["bot"]["name"]
-    try:
-        subscribers = bus.handle(
-            commands.ListSubscribers(channel_name=event["channel"], author=event["bot_id"], text=event["text"]),
-        )[0]
-    except ValueError as e:
-        logger.warning(e)
-        return
-    for subscriber in subscribers:
-        quoted = "> " + "\n> ".join(event["text"].split("\n"))
-        text = f"The app '{bot_name}' mentioned a keyword in <#{event['channel']}>:\n{quoted}"
-        client.chat_postMessage(channel=subscriber, text=text)
+    SlackNotifications.replacements[event["bot_id"]] = bot_name
+    bus.handle(
+        commands.FindMentions(channel_name=event["channel"], author=event["bot_id"], text=event["text"]),
+    )
 
 
 components.append(Listener("event", event_bot_message, args=[{"type": "message", "subtype": "bot_message"}]))
 
 
-def event_message(logger: logging.Logger, event: Message, client: WebClient) -> None:
-    try:
-        subscribers = bus.handle(
-            commands.ListSubscribers(channel_name=event["channel"], author=event["user"], text=event["text"]),
-        )[0]
-    except ValueError as e:
-        logger.warning(e)
-        return
-    for subscriber in subscribers:
-        quoted = "> " + "\n> ".join(event["text"].split("\n"))
-        text = f"<@{event['user']}> mentioned a keyword in <#{event['channel']}>:\n{quoted}"
-        client.chat_postMessage(channel=subscriber, text=text)
+def event_message(event: Message) -> None:
+    bus.handle(
+        commands.FindMentions(channel_name=event["channel"], author=event["user"], text=event["text"]),
+    )
 
 
 components.append(Listener("event", event_message, args=["message"]))
