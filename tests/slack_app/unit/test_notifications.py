@@ -34,8 +34,9 @@ def client_factory(slack_client: FakeSlackClient) -> Callable[[], FakeSlackClien
 
 def test_can_send_message(slack_client: FakeSlackClient, client_factory: Callable[[], SlackClient]) -> None:
     notifications = SlackNotifications(client_factory)
+    notifications.replacements["Hello"] = "Goodbye"
     notifications.send(channel="#general", message="Hello, world!")
-    assert slack_client.messages == [FakeSlackClient.Message("#general", "Hello, world!")]
+    assert slack_client.messages == [FakeSlackClient.Message("#general", "Goodbye, world!")]
 
 
 def test_can_respond(client_factory: Callable[[], SlackClient]) -> None:
@@ -47,7 +48,8 @@ def test_can_respond(client_factory: Callable[[], SlackClient]) -> None:
             self.messages.append(text)
 
     notifications = SlackNotifications(client_factory)
+    notifications.replacements["Hello"] = "Goodbye"
     slack_respond = FakeSlackRespond()
     notifications.slack_respond = slack_respond
     notifications.respond(message="Hello, world!")
-    assert slack_respond.messages == ["Hello, world!"]
+    assert slack_respond.messages == ["Goodbye, world!"]
