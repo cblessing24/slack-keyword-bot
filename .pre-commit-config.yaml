@@ -1,0 +1,37 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+    - id: check-yaml
+    - id: check-added-large-files
+    - id: check-toml
+  - repo: local
+    hooks:
+    - id: pytest
+      name: pytest
+      entry: ./.venv/bin/pytest
+      language: system
+      types: [python]
+      args: [tests]
+    - id: mypy
+      name: mypy
+      entry: ./.venv/bin/mypy
+      language: system
+      types: [python]
+      exclude: "^alembic/"
+    - id: black
+      name: black
+      entry: ./.venv/bin/black
+      language: system
+      types: [python]
+      args: [--check, --diff]
+      exclude: "^alembic/"
+    - id: isort
+      name: isort
+      entry: ./.venv/bin/isort
+      language: system
+      types: [python]
+      args: [--check]
+      exclude: "^alembic/"
