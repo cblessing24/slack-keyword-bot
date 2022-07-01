@@ -29,7 +29,7 @@ DEFAULT_CLIENT_FACTORY = create_slack_client
 
 
 class SlackRespond(Protocol):
-    def __call__(self, message: str) -> None:
+    def __call__(self, text: str) -> None:
         ...
 
 

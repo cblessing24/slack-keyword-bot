@@ -43,8 +43,8 @@ def test_can_respond(client_factory: Callable[[], SlackClient]) -> None:
         def __init__(self) -> None:
             self.messages: list[str] = []
 
-        def __call__(self, message: str) -> None:
-            self.messages.append(message)
+        def __call__(self, text: str) -> None:
+            self.messages.append(text)
 
     notifications = SlackNotifications(client_factory)
     slack_respond = FakeSlackRespond()
